@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ToDoList.models
 {
-    class ToDo
+    public class ToDo
     {
         public string Table = "todo";
         public int Id { get; set; }
