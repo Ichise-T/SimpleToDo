@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data;
 using ToDoList.models;
 
 namespace ToDoList.utils
 {
-    interface IDataConvert
+    public interface IDataConvert
     {
-        List<ToDo> ConvertDataTableToList(DataTable dataTable);
+        public List<ToDo> ConvertDataTableToList(DataTable dataTable);
     }
 
-    class DataConverter : IDataConvert
+    public class DataConverter : IDataConvert
     {
         public List<ToDo> ConvertDataTableToList(DataTable dataTable)
         {
