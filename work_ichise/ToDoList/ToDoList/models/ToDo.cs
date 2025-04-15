@@ -11,6 +11,6 @@ namespace ToDoList.models
         public string Table = "todo";
         public int Id { get; set; }
         public string? Task { get; set; }
-        public bool? Checked { get; set; }
+        public bool  Checked { get; set; } = false;
     }
 }

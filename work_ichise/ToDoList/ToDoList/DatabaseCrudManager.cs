@@ -95,6 +95,7 @@ namespace ToDoList
             this.OpenConnection();
 
             var properties = typeof(T).GetProperties();
+            // 全てのプロパティ名と対応するパラメータプレースホルダを結合
             var setClause = string.Join(",", properties.Select(p => $"{p.Name} =  @{p.Name}" ));
 
             string query = $"UPDATE {tableName} SET {setClause} WHERE id = @id";

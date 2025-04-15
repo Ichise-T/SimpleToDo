@@ -17,6 +17,7 @@ using ToDoList.components;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 using ToDoList.models;
+using ToDoList.utils;
 
 namespace ToDoList
 {
@@ -47,16 +48,7 @@ namespace ToDoList
 
             DataTable dataTable = dbManager.ReadAllData("todo");
 
-            List<ToDo> toDoList = [];
-            foreach (DataRow row in dataTable.Rows)
-            {
-                ToDo toDo = new()
-                {
-                    Id = Convert.ToInt32(row["Id"]), 
-                    Task = row["Task"].ToString()
-                };
-                toDoList.Add(toDo);
-            }
+            List<ToDo> toDoList = new DataConverter().ConvertDataTableToList(dataTable);
 
             toDoList.ForEach(toDo =>
             {
