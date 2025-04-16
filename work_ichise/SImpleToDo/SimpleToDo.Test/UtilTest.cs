@@ -1,17 +1,17 @@
 using System.Data;
-using ToDoList.models;
-using ToDoList.utils;
+using SimpleToDo.models;
+using SimpleToDo.utils;
 using System.Collections.Generic;
 using Xunit;
 using MaterialDesignThemes.Wpf.Converters;
 using MySqlX.XDevAPI.Common;
 
 
-namespace ToDoListTests
+namespace SimpleToDo.Test
 {
-    public class UtilTests
+    public class UtilTest
     {
-        [Fact]
+        [Fact(DisplayName = "DataTable‚©‚çList‚Ö‚Ì•ÏŠ·")]
         public void ConvertDataTableToListShouldReturnCorrectList()
         {
             // Arrange

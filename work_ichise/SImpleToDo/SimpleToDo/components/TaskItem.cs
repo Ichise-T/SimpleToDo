@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows;
-using ToDoList.models;
+using SimpleToDo.models;
 
-namespace ToDoList.components
+namespace SimpleToDo.components
 {
     public partial class TaskItem : DockPanel
     {

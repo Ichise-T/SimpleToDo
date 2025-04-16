@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using Mysqlx.Crud;
 
-namespace ToDoList
+namespace SimpleToDo
 {
     public class DatabaseCrudManager
     {

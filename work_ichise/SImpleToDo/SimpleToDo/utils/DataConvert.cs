@@ -1,7 +1,7 @@
 ﻿using System.Data;
-using ToDoList.models;
+using SimpleToDo.models;
 
-namespace ToDoList.utils
+namespace SimpleToDo.utils
 {
     public interface IDataConvert
     {

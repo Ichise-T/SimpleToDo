@@ -13,13 +13,13 @@ using MaterialDesignThemes.Wpf; // Material Design Package
 using System.IO;
 using System.Data;
 using MySqlX.XDevAPI.Relational;
-using ToDoList.components;
+using SimpleToDo.components;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
-using ToDoList.models;
-using ToDoList.utils;
+using SimpleToDo.models;
+using SimpleToDo.utils;
 
-namespace ToDoList
+namespace SimpleToDo
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -48,14 +48,14 @@ namespace ToDoList
 
             DataTable dataTable = dbManager.ReadAllData("todo");
 
-            List<ToDo> toDoList = new DataConverter().ConvertDataTableToList(dataTable);
+            List<ToDo> ToDoList = new DataConverter().ConvertDataTableToList(dataTable);
 
-            toDoList.ForEach(toDo =>
+            ToDoList.ForEach(toDo =>
             {
                 string table = toDo.Table; 
                 long id = toDo.Id;
                 string? task = toDo.Task;
-                TaskItem taskItem = new(table, id, task, ListBoxToDoList, (table, id) => dbManager.DeleteRecord(table, id));
+                TaskItem taskItem = new(table, id, task, ToDoListBox, (table, id) => dbManager.DeleteRecord(table, id));
             });
 
             dbManager.CloseConnection();
@@ -70,7 +70,7 @@ namespace ToDoList
             long taskId = dbManager.CreateRecord(toDo.Table, toDo);
 
             // タスクアイテムの生成と追加
-            TaskItem taskItem = new(toDo.Table, taskId, task, ListBoxToDoList, (table, id) => dbManager.DeleteRecord(table, id));
+            TaskItem taskItem = new(toDo.Table, taskId, task, ToDoListBox, (table, id) => dbManager.DeleteRecord(table, id));
 
             TextBoxInputTask.Text = "";            
         }
