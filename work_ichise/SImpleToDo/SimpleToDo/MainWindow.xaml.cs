@@ -1,23 +1,12 @@
-﻿using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
+﻿using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Diagnostics;
-using MaterialDesignThemes.Wpf; // Material Design Package
-using System.IO;
 using System.Data;
-using MySqlX.XDevAPI.Relational;
 using SimpleToDo.components;
-using System.Collections.Immutable;
-using System.Threading.Tasks;
 using SimpleToDo.models;
 using SimpleToDo.utils;
+using SimpleToDo.services;
+using MySql.Data.MySqlClient;
+using System.Configuration;
 
 namespace SimpleToDo
 {
@@ -32,20 +21,19 @@ namespace SimpleToDo
         public MainWindow()
         {
             InitializeComponent();
-            dbManager = new DatabaseCrudManager();
-            LoadToDoData();
-        }
 
-        private void InitializeDatabase()
-        {
-            dbManager.DatabaseConnection();
-            dbManager.OpenConnection();
+            // データベース接続文字列を取得
+            string connectionStrings = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+            // MySqlConnectionのファクトリメソッドを作成
+            IDbConnection connectionFactory() => new MySqlConnection(connectionStrings);
+            // DatabaseCrudManagerのインスタンスを作成
+            dbManager = new DatabaseCrudManager(connectionFactory);
+
+            LoadToDoData();
         }
 
         private void LoadToDoData()
         {
-            InitializeDatabase();
-
             DataTable dataTable = dbManager.ReadAllData("todo");
 
             List<ToDo> ToDoList = new DataConverter().ConvertDataTableToList(dataTable);
@@ -57,8 +45,6 @@ namespace SimpleToDo
                 string? task = toDo.Task;
                 TaskItem taskItem = new(table, id, task, ToDoListBox, (table, id) => dbManager.DeleteRecord(table, id));
             });
-
-            dbManager.CloseConnection();
         }
 
         private void AppendTaskButton_Click(object sender, RoutedEventArgs e)

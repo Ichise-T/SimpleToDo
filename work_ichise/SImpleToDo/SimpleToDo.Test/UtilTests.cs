@@ -1,15 +1,10 @@
 using System.Data;
 using SimpleToDo.models;
 using SimpleToDo.utils;
-using System.Collections.Generic;
-using Xunit;
-using MaterialDesignThemes.Wpf.Converters;
-using MySqlX.XDevAPI.Common;
-
 
 namespace SimpleToDo.Test
 {
-    public class UtilTest
+    public class UtilTests
     {
         [Fact(DisplayName = "DataTable‚©‚çList‚Ö‚Ì•ÏŠ·")]
         public void ConvertDataTableToListShouldReturnCorrectList()
