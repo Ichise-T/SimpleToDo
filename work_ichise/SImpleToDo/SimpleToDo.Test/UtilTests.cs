@@ -1,4 +1,4 @@
-using System.Data;
+ï»¿using System.Data;
 using SimpleToDo.models;
 using SimpleToDo.utils;
 
@@ -6,7 +6,7 @@ namespace SimpleToDo.Test
 {
     public class UtilTests
     {
-        [Fact(DisplayName = "DataTable‚©‚çList‚Ö‚Ì•ÏŠ·")]
+        [Fact(DisplayName = "DataTableã‹ã‚‰Listã¸ã®å¤‰æ›")]
         public void ConvertDataTableToListShouldReturnCorrectList()
         {
             // Arrange

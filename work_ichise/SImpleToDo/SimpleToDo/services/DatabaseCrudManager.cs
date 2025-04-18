@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Diagnostics;
 
 namespace SimpleToDo.services
 {
@@ -45,16 +46,8 @@ namespace SimpleToDo.services
             string query = $"INSERT INTO {tableName} ({columnNames}) VALUES ({parameterNames})";
             command.CommandText = query;
 
-            // レコードの各プロパティに対してコマンドにパラメータを追加
-            foreach (var property in properties)
-            {
-                // IDbDataParameter を作成
-                var parameter = command.CreateParameter();
-                parameter.ParameterName = "@" + property.Name;
-                // nullの場合はDBNull.Valueを設定s
-                parameter.Value = property.GetValue(record) ?? DBNull.Value;
-                command.Parameters.Add(parameter);
-            }
+            AddParametersToCommand(command, properties, record);
+
             command.ExecuteNonQuery();
 
             command.CommandText = "SELECT LAST_INSERT_ID()";
@@ -69,13 +62,13 @@ namespace SimpleToDo.services
             connection.Open();
 
             // IDをパラメータ化→"＠"
-            string query = $"DELETE FROM {tableName} WHERE id = @id"; 
+            string query = $"DELETE FROM {tableName} WHERE Id = @Id"; 
             using var command = connection.CreateCommand();
             command.CommandText = query;
 
             // IDパラメータを追加
             var parameter = command.CreateParameter();
-            parameter.ParameterName = "@id";
+            parameter.ParameterName = "@Id";
             parameter.Value = id;
             command.Parameters.Add(parameter);
 
@@ -89,28 +82,43 @@ namespace SimpleToDo.services
 
             var properties = typeof(T).GetProperties();
             // 全てのプロパティ名と対応するパラメータプレースホルダ（"＠"）を結合
-            var setClause = string.Join(",", properties.Select(p => $"{p.Name} =  @{p.Name}" ));
+            var setClause = string.Join(", ", properties.Select(p => $"{p.Name} = @{p.Name}"));
+            Console.WriteLine($"Set Clause: {setClause}");
 
-            string query = $"UPDATE {tableName} SET {setClause} WHERE id = @id";
             using var command = connection.CreateCommand();
+            string query = $"UPDATE {tableName} SET {setClause} WHERE Id = @Id";
             command.CommandText = query;
 
-            foreach(var property in properties)
-            {
-                var parameter = command.CreateParameter();
-                parameter.ParameterName = "@" + property.Name;
-                // nullの場合はDBNull.Valueを設定
-                parameter.Value = property.GetValue(record) ?? DBNull.Value;
-                command.Parameters.Add(parameter);
-            }
+            AddParametersToCommand(command, properties, record);
 
             // ID パラメータを追加
             var idParameter = command.CreateParameter();
-            idParameter.ParameterName = "@id";
+            idParameter.ParameterName = "@Id";
             idParameter.Value = id;
             command.Parameters.Add(idParameter);
 
             command.ExecuteNonQuery();
+        }
+
+        private static void AddParametersToCommand<T>(IDbCommand command, System.Reflection.PropertyInfo[] properties, T record)
+        {
+            // レコードの各プロパティに対してコマンドにパラメータを追加
+            foreach (var property in properties)
+            {
+                try
+                {
+                    // IDbDataParameter を作成
+                    var parameter = command.CreateParameter();
+                    parameter.ParameterName = "@" + property.Name;
+                    // nullの場合はDBNull.Valueを設定
+                    parameter.Value = property.GetValue(record) ?? DBNull.Value;
+                    command.Parameters.Add(parameter);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error adding parameter {property.Name}: {ex.Message}");
+                }
+            }
         }
     }
 }
