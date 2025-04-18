@@ -53,11 +53,11 @@ namespace SimpleToDo.Test
             // Assert：結果を検証
             //---------------------
             // Verify the SQL query
-            var expectedQuery = $"UPDATE {tableName} SET Id = @Id, Task = @Task, Checked = @Checked WHERE Id = @Id";
+            var expectedQuery = $"UPDATE {tableName} SET Task = @Task, Checked = @Checked WHERE Id = @Id";
             Assert.Equal(expectedQuery, mockCommand.Object.CommandText);
 
             // Verify the parameters
-            mockCommand.Verify(c => c.CreateParameter(), Times.Exactly(4)); // 4つのパラメータが作成されることを確認
+            mockCommand.Verify(c => c.CreateParameter(), Times.Exactly(3)); // 3つのパラメータが作成されることを確認
             mockCommand.Verify(c => c.ExecuteNonQuery(), Times.Once); // ExecuteNonQueryが1回呼ばれることを確認
 
             // Verify parameter names and values

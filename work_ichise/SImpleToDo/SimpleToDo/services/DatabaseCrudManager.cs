@@ -36,12 +36,15 @@ namespace SimpleToDo.services
             connection.Open();
 
             // ジェネリック型Tのプロパティを取得
-            var properties = typeof(T).GetProperties();
+            var recordType = record?.GetType();
+            var properties = recordType?.GetProperties()
+                .Where(p => p.Name != "Id") // Idプロパティを除外  
+                .ToArray() ?? [];
             // プロパティからカラム名のカンマ区切りリストを作成
             var columnNames = string.Join(", ", properties.Select(parameter => parameter.Name));
             // SQLクエリのパラメータ名のカンマ区切りリストを作成
             var parameterNames = string.Join(", ", properties.Select(p => "@" + p.Name));
-
+            
             using var command = connection.CreateCommand();
             string query = $"INSERT INTO {tableName} ({columnNames}) VALUES ({parameterNames})";
             command.CommandText = query;
@@ -67,10 +70,10 @@ namespace SimpleToDo.services
             command.CommandText = query;
 
             // IDパラメータを追加
-            var parameter = command.CreateParameter();
-            parameter.ParameterName = "@Id";
-            parameter.Value = id;
-            command.Parameters.Add(parameter);
+            var idParameter = command.CreateParameter();
+            idParameter.ParameterName = "@Id";
+            idParameter.Value = id;
+            command.Parameters.Add(idParameter);
 
             command.ExecuteNonQuery();
         }
@@ -80,22 +83,25 @@ namespace SimpleToDo.services
             using var connection = _connectionFactory();
             connection.Open();
 
-            var properties = typeof(T).GetProperties();
-            // 全てのプロパティ名と対応するパラメータプレースホルダ（"＠"）を結合
-            var setClause = string.Join(", ", properties.Select(p => $"{p.Name} = @{p.Name}"));
-            Console.WriteLine($"Set Clause: {setClause}");
+            Type? recordType = record?.GetType();
+            var properties = recordType?.GetProperties()
+                .Where(p => p.Name != "Id") // Idプロパティを除外  
+                .ToArray() ?? [];
+
+            // 全てのプロパティ名と対応するパラメータプレースホルダ（"@"）を結合  
+            var setClause = string.Join(", ", properties.Select(p => p.Name + " = " + "@" + p.Name));
 
             using var command = connection.CreateCommand();
             string query = $"UPDATE {tableName} SET {setClause} WHERE Id = @Id";
             command.CommandText = query;
 
-            AddParametersToCommand(command, properties, record);
-
-            // ID パラメータを追加
+            // ID パラメータを追加  
             var idParameter = command.CreateParameter();
             idParameter.ParameterName = "@Id";
             idParameter.Value = id;
             command.Parameters.Add(idParameter);
+
+            AddParametersToCommand(command, properties, record);
 
             command.ExecuteNonQuery();
         }

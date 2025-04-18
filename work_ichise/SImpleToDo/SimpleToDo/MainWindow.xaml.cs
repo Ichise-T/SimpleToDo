@@ -40,7 +40,12 @@ namespace SimpleToDo
 
             ToDoList.ForEach(toDo =>
             {
-                TaskItem taskItem = new(toDo, ToDoListBox, (table, id) => dbManager.DeleteRecord(table, id));
+                TaskItem taskItem = new
+                    (toDo, 
+                    ToDoListBox,
+                    (table, id, toDo) => dbManager.UpdateRecord(table, id, toDo),
+                    (table, id) => dbManager.DeleteRecord(table, id)
+                );
             });
         }
 
@@ -52,7 +57,13 @@ namespace SimpleToDo
             long taskId = dbManager.CreateRecord(toDo.Table, toDo);
 
             // タスクアイテムの生成と追加
-            TaskItem taskItem = new(toDo, ToDoListBox, (table, id) => dbManager.DeleteRecord(table, id));
+            TaskItem taskItem = new
+                (
+                    toDo, 
+                    ToDoListBox,
+                    (table, id, toDo) => dbManager.UpdateRecord(table, id, toDo),
+                    (table, id) => dbManager.DeleteRecord(table, id)
+                );
 
             TextBoxInputTask.Text = "";            
         }

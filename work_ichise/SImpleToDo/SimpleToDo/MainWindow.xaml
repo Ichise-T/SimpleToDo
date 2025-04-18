@@ -11,15 +11,15 @@
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
-        Title="タスク管理アプリ" Height="450" Width="800">
-    <Grid Margin="0,10,0,0">
+        Title="タスク管理アプリ" Height="480" Width="894">
+    <Grid Margin="0,10,0,3">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="289*"/>
             <ColumnDefinition Width="511*"/>
         </Grid.ColumnDefinitions>
         <Calendar x:Name="Calender" HorizontalAlignment="Center" Margin="0,40,0,0" VerticalAlignment="Top" Cursor="AppStarting" Height="355" Width="236"/>
-        <TextBox x:Name="TextBoxInputTask" HorizontalAlignment="Left" Margin="40,44,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="365" Height="32" Grid.Column="1" KeyDown="TextBoxInputTask_KeyDown" />
-        <Button x:Name="AppendTaskButton" Grid.Column="1" Content="追加" HorizontalAlignment="Left" Margin="410,44,0,0" VerticalAlignment="Top" Height="32" Width="68" Click="AppendTaskButton_Click"/>
+        <TextBox x:Name="TextBoxInputTask" HorizontalAlignment="Left" Margin="40,44,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="414" Height="32" Grid.Column="1" KeyDown="TextBoxInputTask_KeyDown" />
+        <Button x:Name="AppendTaskButton" Grid.Column="1" Content="追加" HorizontalAlignment="Left" Margin="459,44,0,0" VerticalAlignment="Top" Height="32" Width="68" Click="AppendTaskButton_Click"/>
         <ListBox x:Name="ToDoListBox" Grid.Column="1" Margin="40,95,44,29">
         </ListBox>
     </Grid>
