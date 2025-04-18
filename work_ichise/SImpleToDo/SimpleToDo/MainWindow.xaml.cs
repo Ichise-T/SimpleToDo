@@ -40,23 +40,19 @@ namespace SimpleToDo
 
             ToDoList.ForEach(toDo =>
             {
-                string table = toDo.Table; 
-                long id = toDo.Id;
-                string? task = toDo.Task;
-                TaskItem taskItem = new(table, id, task, ToDoListBox, (table, id) => dbManager.DeleteRecord(table, id));
+                TaskItem taskItem = new(toDo, ToDoListBox, (table, id) => dbManager.DeleteRecord(table, id));
             });
         }
 
         private void AppendTaskButton_Click(object sender, RoutedEventArgs e)
         {
-            string task = TextBoxInputTask.Text;
-            ToDo toDo = new() { Task = task };
+            ToDo toDo = new() { Task = TextBoxInputTask.Text };
                         
             // データベースに追加
             long taskId = dbManager.CreateRecord(toDo.Table, toDo);
 
             // タスクアイテムの生成と追加
-            TaskItem taskItem = new(toDo.Table, taskId, task, ToDoListBox, (table, id) => dbManager.DeleteRecord(table, id));
+            TaskItem taskItem = new(toDo, ToDoListBox, (table, id) => dbManager.DeleteRecord(table, id));
 
             TextBoxInputTask.Text = "";            
         }

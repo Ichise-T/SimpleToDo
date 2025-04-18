@@ -10,10 +10,14 @@ namespace SimpleToDo.Test
         [Fact(DisplayName = "UpdateRecordは正しいクエリを構築し、パラメータを追加する必要がある")]
         public static void UpdateRecordShouldConstructCorrectQueryAndAddParameters()
         {
+            //----------------------
             // Arrange：テスト準備
+            //----------------------
             var mockConnection = new Mock<IDbConnection>();
             var mockCommand = new Mock<IDbCommand>();
             mockConnection.Setup(c => c.CreateCommand()).Returns(mockCommand.Object);
+            var mockParameters = new Mock<IDataParameterCollection>();
+            mockCommand.Setup(c => c.Parameters).Returns(mockParameters.Object);
 
             var connectionFactory = new Func<IDbConnection>(() => mockConnection.Object);
             var dbManager = new DatabaseCrudManager(connectionFactory);
@@ -35,19 +39,19 @@ namespace SimpleToDo.Test
                 parameter.SetupProperty(p => p.ParameterName); // ParameterNameをプロパティの設定可能にする
                 parameter.SetupProperty(p => p.Value); // Valueをプロパティの設定可能にする
                 return parameter.Object;
-            });
-
-            // Parametersプロパティのモックを作成
-            var mockParameters = new Mock<IDataParameterCollection>();
-            mockCommand.Setup(c => c.Parameters).Returns(mockParameters.Object);
-
+            });                          
+            
             // Mock Parameters.Add behavior：Parameters.Addの動作を設定
             mockParameters.Setup(p => p.Add(It.IsAny<object>())).Returns(0);
 
+            //----------------------------------
             // Act：テスト対象のメソッドを実行
+            //----------------------------------
             dbManager.UpdateRecord(tableName, recordId, testToDoRecord);
 
+            //---------------------
             // Assert：結果を検証
+            //---------------------
             // Verify the SQL query
             var expectedQuery = $"UPDATE {tableName} SET Id = @Id, Task = @Task, Checked = @Checked WHERE Id = @Id";
             Assert.Equal(expectedQuery, mockCommand.Object.CommandText);

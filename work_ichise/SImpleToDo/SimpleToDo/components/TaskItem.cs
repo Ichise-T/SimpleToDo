@@ -2,26 +2,24 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows;
+using SimpleToDo.models;
 
 namespace SimpleToDo.components
 {
     public partial class TaskItem : DockPanel
     {
         private readonly ListBox _parentListBox;
-        private readonly string _tableName;
+        private readonly ToDo _toDo;
         private readonly long _taskId;
         private static Action<string, long>? DeleteRecord { get; set;}
 
         public TaskItem(
-            string tableName, 
-            long taskId, 
-            string? taskContent, 
+            ToDo toDo,
             ListBox parentListBox, 
             Action<string, long>? ParentDeleteRecord)
         {
             _parentListBox = parentListBox;
-            _tableName = tableName;
-            _taskId = taskId;
+            _toDo = toDo;
             DeleteRecord = ParentDeleteRecord;
 
             // DockPanelの初期設定
@@ -32,7 +30,7 @@ namespace SimpleToDo.components
             // CheckBoxの生成
             CheckBox CheckBoxTask = new()
             {
-                Content = taskContent ?? "",
+                Content = _toDo.Task ?? "",
                 Height = 33,
                 Width = 371,
             };
@@ -66,7 +64,7 @@ namespace SimpleToDo.components
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             _parentListBox.Items.Remove(this);
-            DeleteRecord?.Invoke(_tableName, _taskId);
+            DeleteRecord?.Invoke(_toDo.Table, _taskId);
         }
     }
 }

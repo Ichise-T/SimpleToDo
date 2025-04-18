@@ -107,7 +107,7 @@ namespace SimpleToDo.services
             {
                 try
                 {
-                    // IDbDataParameter を作成
+                    // IDbDataParameterを作成
                     var parameter = command.CreateParameter();
                     parameter.ParameterName = "@" + property.Name;
                     // nullの場合はDBNull.Valueを設定
