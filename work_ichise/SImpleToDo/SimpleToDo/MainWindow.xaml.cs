@@ -41,7 +41,8 @@ namespace SimpleToDo
             ToDoList.ForEach(toDo =>
             {
                 TaskItem taskItem = new
-                    (toDo, 
+                (
+                    toDo, 
                     ToDoListBox,
                     (table, id, toDo) => dbManager.UpdateRecord(table, id, toDo),
                     (table, id) => dbManager.DeleteRecord(table, id)
