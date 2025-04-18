@@ -17,4 +17,7 @@ packages/
 # log
 *.log
 
+# config
+App.config
+
 # etc
