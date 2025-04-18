@@ -13,8 +13,8 @@
                 name="MySqlConnection" 
                 connectionString="server=localhost;
                 userid=root;
-                password=3500BC;
-                database=my_db"
+                password=password;
+                database=my_database"
                 providerName="MySql.Data.MySqlClient"
             />
         </connectionStrings>
