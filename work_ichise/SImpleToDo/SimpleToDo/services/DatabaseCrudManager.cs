@@ -7,6 +7,49 @@ namespace SimpleToDo.services
     {
         private readonly Func<IDbConnection> _connectionFactory = connectionFactory;
 
+        public void CreateTable(string tableName, string[] columnDefinitions)
+        {
+            using var connection = _connectionFactory();
+            connection.Open();
+
+            // テーブル作成のSQLクエリを生成
+            string query = $"CREATE TABLE IF NOT EXISTS {tableName} (Id INTEGER PRIMARY KEY AUTOINCREMENT, {string.Join(", ", columnDefinitions)})";
+            using var command = connection.CreateCommand();
+            command.CommandText = query;
+
+            // SQLクエリを実行
+            command.ExecuteNonQuery();
+        }
+
+        public long CreateRecord<T>(string tableName, T record)
+        {
+            using var connection = _connectionFactory();
+            connection.Open();
+
+            // ジェネリック型Tのプロパティを取得
+            var recordType = record?.GetType();
+            var properties = recordType?.GetProperties()
+                .Where(p => p.Name != "Id") // Idプロパティを除外  
+                .ToArray() ?? [];
+            // プロパティからカラム名のカンマ区切りリストを作成
+            var columnNames = string.Join(", ", properties.Select(parameter => parameter.Name));
+            // SQLクエリのパラメータ名のカンマ区切りリストを作成
+            var parameterNames = string.Join(", ", properties.Select(p => "@" + p.Name));
+
+            using var command = connection.CreateCommand();
+            string query = $"INSERT INTO {tableName} ({columnNames}) VALUES ({parameterNames})";
+            command.CommandText = query;
+
+            AddParametersToCommand(command, properties, record);
+
+            command.ExecuteNonQuery();
+
+            command.CommandText = "SELECT LAST_INSERT_ID()";
+
+            // 最後に挿入されたレコードのIDを取得
+            return Convert.ToInt64(command.ExecuteScalar());
+        }
+
         public DataTable ReadAllData(string tableName)
         {
             // DataTableを作成
@@ -28,54 +71,6 @@ namespace SimpleToDo.services
             dataTable.Load(reader);
 
             return dataTable;
-        }
-
-        public long CreateRecord<T>(string tableName, T record)
-        {
-            using var connection = _connectionFactory();
-            connection.Open();
-
-            // ジェネリック型Tのプロパティを取得
-            var recordType = record?.GetType();
-            var properties = recordType?.GetProperties()
-                .Where(p => p.Name != "Id") // Idプロパティを除外  
-                .ToArray() ?? [];
-            // プロパティからカラム名のカンマ区切りリストを作成
-            var columnNames = string.Join(", ", properties.Select(parameter => parameter.Name));
-            // SQLクエリのパラメータ名のカンマ区切りリストを作成
-            var parameterNames = string.Join(", ", properties.Select(p => "@" + p.Name));
-            
-            using var command = connection.CreateCommand();
-            string query = $"INSERT INTO {tableName} ({columnNames}) VALUES ({parameterNames})";
-            command.CommandText = query;
-
-            AddParametersToCommand(command, properties, record);
-
-            command.ExecuteNonQuery();
-
-            command.CommandText = "SELECT LAST_INSERT_ID()";
-
-            // 最後に挿入されたレコードのIDを取得
-            return Convert.ToInt64(command.ExecuteScalar());
-        }
-
-        public void DeleteRecord(string tableName, long id)
-        {
-            using var connection = _connectionFactory();
-            connection.Open();
-
-            // IDをパラメータ化→"＠"
-            string query = $"DELETE FROM {tableName} WHERE Id = @Id"; 
-            using var command = connection.CreateCommand();
-            command.CommandText = query;
-
-            // IDパラメータを追加
-            var idParameter = command.CreateParameter();
-            idParameter.ParameterName = "@Id";
-            idParameter.Value = id;
-            command.Parameters.Add(idParameter);
-
-            command.ExecuteNonQuery();
         }
 
         public void UpdateRecord<T>(string tableName, long id, T record)
@@ -102,6 +97,25 @@ namespace SimpleToDo.services
             command.Parameters.Add(idParameter);
 
             AddParametersToCommand(command, properties, record);
+
+            command.ExecuteNonQuery();
+        }
+
+        public void DeleteRecord(string tableName, long id)
+        {
+            using var connection = _connectionFactory();
+            connection.Open();
+
+            // IDをパラメータ化→"＠"
+            string query = $"DELETE FROM {tableName} WHERE Id = @Id"; 
+            using var command = connection.CreateCommand();
+            command.CommandText = query;
+
+            // IDパラメータを追加
+            var idParameter = command.CreateParameter();
+            idParameter.ParameterName = "@Id";
+            idParameter.Value = id;
+            command.Parameters.Add(idParameter);
 
             command.ExecuteNonQuery();
         }

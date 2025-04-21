@@ -36,8 +36,8 @@ namespace SimpleToDo.Test
             {
                 // CreateParameterがモックされたIDbDataParameterを返す
                 var parameter = new Mock<IDbDataParameter>();
-                parameter.SetupProperty(p => p.ParameterName); // ParameterNameをプロパティの設定可能にする
-                parameter.SetupProperty(p => p.Value); // Valueをプロパティの設定可能にする
+                parameter.SetupProperty(p => p.ParameterName); // ParameterNameをプロパティの設定可能にする*
+                parameter.SetupProperty(p => p.Value); // Valueをプロパティの設定可能にする*
                 return parameter.Object;
             });                          
             
