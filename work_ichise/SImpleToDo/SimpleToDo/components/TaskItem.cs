@@ -8,6 +8,7 @@ namespace SimpleToDo.components
 {
     public partial class TaskItem : DockPanel
     {
+        private readonly string tableName = "todo";
         private readonly ListBox _parentListBox;
         public readonly ToDo _toDo;
         private static Action<string, long>? DeleteRecord { get; set; }
@@ -82,7 +83,7 @@ namespace SimpleToDo.components
         private void CheckBoxTask_Click(object sender, RoutedEventArgs e)
         {
             _toDo.Checked = ((CheckBox)sender).IsChecked ?? false;
-            UpdateRecord?.Invoke(_toDo.Table, _toDo.Id, new ToDo
+            UpdateRecord?.Invoke(tableName, _toDo.Id, new ToDo
             {
                 Task = _toDo.Task,
                 Checked = _toDo.Checked
@@ -92,7 +93,7 @@ namespace SimpleToDo.components
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             _parentListBox.Items.Remove(this);
-            DeleteRecord?.Invoke(_toDo.Table, _toDo.Id);
+            DeleteRecord?.Invoke(tableName, _toDo.Id);
         }
 
         private void EditContextMenu_Click(object sender, RoutedEventArgs e)

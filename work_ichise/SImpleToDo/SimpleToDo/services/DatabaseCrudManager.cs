@@ -30,7 +30,9 @@ namespace SimpleToDo.services
             var recordType = record?.GetType();
             var properties = recordType?.GetProperties()
                 .Where(p => p.Name != "Id") // Idプロパティを除外  
-                .ToArray() ?? [];
+                .ToArray();
+            properties ??= [];
+
             // プロパティからカラム名のカンマ区切りリストを作成
             var columnNames = string.Join(", ", properties.Select(parameter => parameter.Name));
             // SQLクエリのパラメータ名のカンマ区切りリストを作成
@@ -50,7 +52,7 @@ namespace SimpleToDo.services
             return Convert.ToInt64(command.ExecuteScalar());
         }
 
-        public DataTable ReadAllData(string tableName)
+        public DataTable ReadAllRecord(string tableName)
         {
             // DataTableを作成
             DataTable dataTable = new();
@@ -70,6 +72,29 @@ namespace SimpleToDo.services
             // DataTableにデータを読み込む
             dataTable.Load(reader);
 
+            return dataTable;
+        }
+
+        public DataTable ReadRecordById(string tableName, long id)
+        {
+            DataTable dataTable = new();
+
+            using var connection = _connectionFactory();
+            connection.Open();
+
+            using var command = connection.CreateCommand();
+            string query = $"SELECT * FROM {tableName} WHERE Id = @Id";
+            command.CommandText = query;
+
+            var idParameter = command.CreateParameter();
+            idParameter.ParameterName = "@Id";
+            idParameter.Value = id;
+            command.Parameters.Add(idParameter);
+
+            using var reader = command.ExecuteReader();
+
+            // DataTableにデータを読み込む
+            dataTable.Load(reader);
             return dataTable;
         }
 
@@ -99,6 +124,10 @@ namespace SimpleToDo.services
             AddParametersToCommand(command, properties, record);
 
             command.ExecuteNonQuery();
+
+            command.CommandText = "SELECT LAST_INSERT_ID()";
+            var result = Convert.ToInt64(command.ExecuteScalar());
+            Debug.WriteLine("UpdateRecord result：" + result);
         }
 
         public void DeleteRecord(string tableName, long id)
@@ -111,7 +140,7 @@ namespace SimpleToDo.services
             using var command = connection.CreateCommand();
             command.CommandText = query;
 
-            // IDパラメータを追加
+            // パラメータにIDを追加
             var idParameter = command.CreateParameter();
             idParameter.ParameterName = "@Id";
             idParameter.Value = id;
