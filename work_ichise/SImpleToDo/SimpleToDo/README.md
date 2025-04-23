@@ -2,7 +2,7 @@
 
 ## 環境構築
 
-- SimpleToDoプロジェクトのフォルダ内にApp.configを作成し、MySQL Serverの接続文字列を設定する。
+- SimpleToDoプロジェクトのフォルダ内にApp.configを作成し、MySQL Serverの接続文字列とOpenWeatherのAPIキーを設定する。
 - 例）↓
   
   ```App.config
