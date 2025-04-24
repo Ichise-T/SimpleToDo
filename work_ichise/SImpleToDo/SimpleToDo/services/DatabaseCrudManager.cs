@@ -7,13 +7,37 @@ namespace SimpleToDo.services
     {
         private readonly Func<IDbConnection> _connectionFactory = connectionFactory;
 
-        public void CreateTable(string tableName, string[] columnDefinitions)
+        public void CreateDatabase(string databaseName)
         {
             using var connection = _connectionFactory();
             connection.Open();
 
+            // データベースの種類を判別
+            string databaseType = connection.GetType().Name.ToLower();
+
+            // データベースごとのクエリを生成
+            string query = databaseType switch
+            {
+                "mysqlconnection" => $"CREATE DATABASE IF NOT EXISTS {databaseName};",
+                "npgsqlconnection" => $"CREATE DATABASE {databaseName};",
+                "sqlconnection" => $"IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = {databaseName}) CREATE DATABASE [{databaseName}];",
+                "sqliteconnection" => throw new NotSupportedException("SQLite does not support creating multiple databases."),
+                _ => throw new NotSupportedException($"Unsupported database type: {databaseType}")
+            };
+
+            using var command = connection.CreateCommand();
+            command.CommandText = query;
+            command.ExecuteNonQuery();
+        }
+
+        public void CreateTable(string databaseName, string tableName, string[] columnDefinitions)
+        {
+            using var connection = _connectionFactory();
+            connection.Open(); 
+            connection.ChangeDatabase(databaseName);           
+
             // テーブル作成のSQLクエリを生成
-            string query = $"CREATE TABLE IF NOT EXISTS {tableName} (Id INTEGER PRIMARY KEY AUTOINCREMENT, {string.Join(", ", columnDefinitions)})";
+            string query = $"CREATE TABLE IF NOT EXISTS {tableName} (id INT AUTO_INCREMENT PRIMARY KEY, {string.Join(", ", columnDefinitions)});";
             using var command = connection.CreateCommand();
             command.CommandText = query;
 
@@ -21,10 +45,11 @@ namespace SimpleToDo.services
             command.ExecuteNonQuery();
         }
 
-        public long CreateRecord<T>(string tableName, T record)
+        public long CreateRecord<T>(string databaseName, string tableName, T record)
         {
             using var connection = _connectionFactory();
             connection.Open();
+            connection.ChangeDatabase(databaseName);
 
             // ジェネリック型Tのプロパティを取得
             var recordType = record?.GetType();
@@ -52,14 +77,12 @@ namespace SimpleToDo.services
             return Convert.ToInt64(command.ExecuteScalar());
         }
 
-        public DataTable ReadAllRecord(string tableName)
+        public DataTable ReadAllRecord(string databaseName, string tableName)
         {
-            // DataTableを作成
-            DataTable dataTable = new();
-
             // データベース接続を開く
             using var connection = _connectionFactory();
             connection.Open();
+            connection.ChangeDatabase(databaseName);
 
             // IDbCommandを作成
             using var command = connection.CreateCommand();
@@ -70,17 +93,17 @@ namespace SimpleToDo.services
             using var reader = command.ExecuteReader();
 
             // DataTableにデータを読み込む
+            DataTable dataTable = new();
             dataTable.Load(reader);
 
             return dataTable;
         }
 
-        public DataTable ReadRecordById(string tableName, long id)
+        public DataTable ReadRecordById(string databaseName, string tableName, long id)
         {
-            DataTable dataTable = new();
-
-            using var connection = _connectionFactory();
+            using var connection = _connectionFactory();            
             connection.Open();
+            connection.ChangeDatabase(databaseName);
 
             using var command = connection.CreateCommand();
             string query = $"SELECT * FROM {tableName} WHERE Id = @Id";
@@ -94,19 +117,22 @@ namespace SimpleToDo.services
             using var reader = command.ExecuteReader();
 
             // DataTableにデータを読み込む
+            DataTable dataTable = new();
             dataTable.Load(reader);
             return dataTable;
         }
 
-        public void UpdateRecord<T>(string tableName, long id, T record)
+        public void UpdateRecord<T>(string databaseName, string tableName, long id, T record)
         {
-            using var connection = _connectionFactory();
+            using var connection = _connectionFactory();            
             connection.Open();
+            connection.ChangeDatabase(databaseName);
 
             Type? recordType = record?.GetType();
             var properties = recordType?.GetProperties()
                 .Where(p => p.Name != "Id") // Idプロパティを除外  
-                .ToArray() ?? [];
+                .ToArray();
+            properties ??= [];
 
             // 全てのプロパティ名と対応するパラメータプレースホルダ（"@"）を結合  
             var setClause = string.Join(", ", properties.Select(p => p.Name + " = " + "@" + p.Name));
@@ -124,16 +150,13 @@ namespace SimpleToDo.services
             AddParametersToCommand(command, properties, record);
 
             command.ExecuteNonQuery();
-
-            command.CommandText = "SELECT LAST_INSERT_ID()";
-            var result = Convert.ToInt64(command.ExecuteScalar());
-            Debug.WriteLine("UpdateRecord result：" + result);
         }
 
-        public void DeleteRecord(string tableName, long id)
+        public void DeleteRecord(string databaseName, string tableName, long id)
         {
-            using var connection = _connectionFactory();
+            using var connection = _connectionFactory();            
             connection.Open();
+            connection.ChangeDatabase(databaseName);
 
             // IDをパラメータ化→"＠"
             string query = $"DELETE FROM {tableName} WHERE Id = @Id"; 

@@ -27,6 +27,7 @@ namespace SimpleToDo.Test
                 Task = "Test Task",
                 Checked = true
             };
+            string databaseName = "testdb";
             string tableName = "todo";
             long recordId = 1;
 
@@ -47,7 +48,7 @@ namespace SimpleToDo.Test
             //----------------------------------
             // Act：テスト対象のメソッドを実行
             //----------------------------------
-            dbManager.UpdateRecord(tableName, recordId, testToDoRecord);
+            dbManager.UpdateRecord(databaseName, tableName, recordId, testToDoRecord);
 
             //---------------------
             // Assert：結果を検証
