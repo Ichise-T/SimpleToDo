@@ -5,8 +5,14 @@ using SimpleToDo.models;
 
 namespace SimpleToDo.Test
 {
+    /// <summary>
+    /// DatabaseCrudManagerの各メソッドの動作を検証する単体テストクラスです。
+    /// </summary>
     public class DatabaseCrudManagerTests
     {
+        /// <summary>
+        /// UpdateRecordメソッドが正しいSQLクエリを構築し、適切なパラメータを追加しているかを検証します。
+        /// </summary>
         [Fact(DisplayName = "UpdateRecordは正しいクエリを構築し、パラメータを追加する必要がある")]
         public static void UpdateRecordShouldConstructCorrectQueryAndAddParameters()
         {
@@ -24,8 +30,8 @@ namespace SimpleToDo.Test
 
             ToDo testToDoRecord = new()
             {
-                Task = "Test Task",
-                Checked = true
+                TaskName = "Test Task",
+                IsChecked = true
             };
             string databaseName = "testdb";
             string tableName = "todo";

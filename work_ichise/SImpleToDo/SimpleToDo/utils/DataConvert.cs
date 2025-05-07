@@ -19,8 +19,8 @@ namespace SimpleToDo.utils
                 ToDo toDo = new()
                 {
                     Id = Convert.ToInt32(row["Id"]),
-                    Task = row["Task"].ToString(),
-                    Checked = Convert.ToBoolean(row["Checked"]),
+                    TaskName = row["TaskName"].ToString(),
+                    IsChecked = Convert.ToBoolean(row["IsChecked"]),
                 };
                 toDoList.Add(toDo);
             }

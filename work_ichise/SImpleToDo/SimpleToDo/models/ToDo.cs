@@ -3,7 +3,7 @@
     public class ToDo
     {
         public long Id { get; set; }
-        public string? Task { get; set; }
-        public bool  Checked { get; set; } = false;
+        public string? TaskName { get; set; }
+        public bool  IsChecked { get; set; } = false;
     }
 }

@@ -7,6 +7,11 @@ namespace SimpleToDo.services
     {
         private readonly Func<IDbConnection> _connectionFactory = connectionFactory;
 
+        /// <summary>
+        /// 指定した名前でデータベースを作成します。
+        /// データベースの種類（MySQL, PostgreSQL, SQL Server, SQLite）に応じて適切なSQLを実行します。
+        /// </summary>
+        /// <param name="databaseName">作成するデータベース名</param>
         public void CreateDatabase(string databaseName)
         {
             using var connection = _connectionFactory();
@@ -30,6 +35,12 @@ namespace SimpleToDo.services
             command.ExecuteNonQuery();
         }
 
+        /// <summary>
+        /// 指定したデータベースにテーブルを作成します。
+        /// </summary>
+        /// <param name="databaseName">データベース名</param>
+        /// <param name="tableName">テーブル名</param>
+        /// <param name="columnDefinitions">カラム定義の配列（例: "name VARCHAR(100)"）</param>
         public void CreateTable(string databaseName, string tableName, string[] columnDefinitions)
         {
             using var connection = _connectionFactory();
@@ -45,6 +56,14 @@ namespace SimpleToDo.services
             command.ExecuteNonQuery();
         }
 
+        /// <summary>
+        /// 指定したテーブルにレコードを挿入し、挿入されたレコードのIDを返します。
+        /// </summary>
+        /// <typeparam name="T">レコードの型</typeparam>
+        /// <param name="databaseName">データベース名</param>
+        /// <param name="tableName">テーブル名</param>
+        /// <param name="record">挿入するレコードオブジェクト</param>
+        /// <returns>挿入されたレコードのID</returns>
         public long CreateRecord<T>(string databaseName, string tableName, T record)
         {
             using var connection = _connectionFactory();
@@ -77,6 +96,12 @@ namespace SimpleToDo.services
             return Convert.ToInt64(command.ExecuteScalar());
         }
 
+        /// <summary>
+        /// 指定したデータベース・テーブルの全レコードをDataTableとして取得します。
+        /// </summary>
+        /// <param name="databaseName">データベース名</param>
+        /// <param name="tableName">テーブル名</param>
+        /// <returns>全レコードを格納したDataTable</returns>
         public DataTable ReadAllRecord(string databaseName, string tableName)
         {
             // データベース接続を開く
@@ -99,6 +124,13 @@ namespace SimpleToDo.services
             return dataTable;
         }
 
+        /// <summary>
+        /// 指定したIDのレコードをDataTableとして取得します。
+        /// </summary>
+        /// <param name="databaseName">データベース名</param>
+        /// <param name="tableName">テーブル名</param>
+        /// <param name="id">レコードID</param>
+        /// <returns>該当レコードを格納したDataTable</returns>
         public DataTable ReadRecordById(string databaseName, string tableName, long id)
         {
             using var connection = _connectionFactory();            
@@ -122,6 +154,14 @@ namespace SimpleToDo.services
             return dataTable;
         }
 
+        /// <summary>
+        /// 指定したIDのレコードを新しい値で更新します。
+        /// </summary>
+        /// <typeparam name="T">レコードの型</typeparam>
+        /// <param name="databaseName">データベース名</param>
+        /// <param name="tableName">テーブル名</param>
+        /// <param name="id">レコードID</param>
+        /// <param name="record">更新する値を持つオブジェクト</param>
         public void UpdateRecord<T>(string databaseName, string tableName, long id, T record)
         {
             using var connection = _connectionFactory();            
@@ -152,6 +192,12 @@ namespace SimpleToDo.services
             command.ExecuteNonQuery();
         }
 
+        /// <summary>
+        /// 指定したIDのレコードを削除します。
+        /// </summary>
+        /// <param name="databaseName">データベース名</param>
+        /// <param name="tableName">テーブル名</param>
+        /// <param name="id">削除するレコードのID</param>
         public void DeleteRecord(string databaseName, string tableName, long id)
         {
             using var connection = _connectionFactory();            
@@ -172,6 +218,13 @@ namespace SimpleToDo.services
             command.ExecuteNonQuery();
         }
 
+        /// <summary>
+        /// 指定したレコードのプロパティをコマンドのパラメータとして追加します。
+        /// </summary>
+        /// <typeparam name="T">レコードの型</typeparam>
+        /// <param name="command">IDbCommandオブジェクト</param>
+        /// <param name="properties">プロパティ情報配列</param>
+        /// <param name="record">パラメータ値を持つオブジェクト</param>
         private static void AddParametersToCommand<T>(IDbCommand command, System.Reflection.PropertyInfo[] properties, T record)
         {
             // レコードの各プロパティに対してコマンドにパラメータを追加

@@ -26,8 +26,8 @@
       </connectionStrings>
       <appSettings>
         <add key="OpenWeatherAPIKey" value="your_api_key"/>;
-        <add key="DatabaseName" value="simple_todo"/>
-        <add key="TableName" value="todo"/>
+        <add key="DatabaseName" value="SimpleToDo"/>
+        <add key="TableName" value="ToDo"/>
       </appSettings>
     </configuration>
   ```

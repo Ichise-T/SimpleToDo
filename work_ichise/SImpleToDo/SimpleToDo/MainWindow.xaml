@@ -11,16 +11,59 @@
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
-        Title="タスク管理アプリ" Height="480" Width="894">
+        Title="タスク管理アプリ" Height="625" Width="876">
     <Grid Margin="0,10,0,3">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="289*"/>
-            <ColumnDefinition Width="511*"/>
+            <ColumnDefinition MinWidth="290"/>
+            <ColumnDefinition Width="387*"/>
         </Grid.ColumnDefinitions>
-        <Calendar x:Name="Calender" HorizontalAlignment="Center" Margin="0,40,0,0" VerticalAlignment="Top" Cursor="AppStarting" Height="355" Width="236"/>
-        <TextBox x:Name="TextBoxInputTask" HorizontalAlignment="Left" Margin="40,44,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="414" Height="32" Grid.Column="1" KeyDown="TextBoxInputTask_KeyDown" />
-        <Button x:Name="AppendTaskButton" Grid.Column="1" Content="追加" HorizontalAlignment="Left" Margin="459,44,0,0" VerticalAlignment="Top" Height="32" Width="68" Click="AppendTaskButton_Click"/>
-        <ListBox x:Name="ToDoListBox" Grid.Column="1" Margin="40,95,44,29">
-        </ListBox>
+        <Calendar x:Name="Calendar" Margin="20,40,0,0" Cursor="AppStarting" MinHeight="350" VerticalAlignment="Top" MinWidth="250" HorizontalAlignment="Left" Width="250"/>
+        <TextBox x:Name="TextBoxInputTask" Margin="20,40,125,0" TextWrapping="Wrap" Grid.Column="1" KeyDown="TextBoxInputTask_KeyDown" Height="32" VerticalAlignment="Top" />
+        <Button x:Name="AppendTaskButton" Grid.Column="1" Content="追加" Margin="0,40,20,0" Click="AppendTaskButton_Click" Height="32" VerticalAlignment="Top" HorizontalAlignment="Right" Width="100"/>
+        <ItemsControl
+            x:Name="TaskItemsControl"
+            Grid.IsSharedSizeScope="True"
+            ItemsSource="{Binding ToDoItems}" Grid.Column="1" Margin="20,90,20,0">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border
+                        x:Name="TaskBorder"
+                        Padding="8"
+                        Margin="4"
+                        BorderBrush="{DynamicResource MaterialDesignDivider}"
+                        BorderThickness="1">
+                        <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <!-- CheckBox -->
+                        <CheckBox
+                            VerticalAlignment="Center"
+                            IsChecked="{Binding IsChecked}"
+                            Command="{Binding UpdateIsCheckedCommand}" />
+                        <!-- Task Content -->
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Text="{Binding TaskName}"
+                            Margin="8,0,0,0" />
+                        <!-- Delete Button -->
+                        <Button
+                            Grid.Column="2"
+                            Content="削除"
+                            Command="{Binding DeleteCommand}"
+                            Margin="8,0,0,0" />
+                        </Grid>
+                    </Border>
+                    <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding IsChecked}" Value="True">
+                            <Setter TargetName="TaskBorder" Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
 </Window>
