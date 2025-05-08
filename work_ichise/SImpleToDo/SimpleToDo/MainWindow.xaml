@@ -18,6 +18,41 @@
             <ColumnDefinition Width="387*"/>
         </Grid.ColumnDefinitions>
         <Calendar x:Name="Calendar" Margin="20,40,0,0" Cursor="AppStarting" MinHeight="350" VerticalAlignment="Top" MinWidth="250" HorizontalAlignment="Left" Width="250"/>
+        <ItemsControl
+            x:Name="WeatherInfo"
+            Grid.IsSharedSizeScope="True"
+            ItemsSource="{Binding WeatherInfoItems}" Margin="20,395,20,0">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border
+                        x:Name="WeatherInfoBorder"
+                        Padding="8"
+                        Margin="4"
+                        BorderBrush="{DynamicResource MaterialDesignDivider}"
+                        BorderThickness="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Text="{Binding WeatherInfo}"
+                            />
+                        </Grid>
+                    </Border>
+                    <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding Is_Checked}" Value="True">
+                            <Setter TargetName="WeatherInfoBorder" Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
         <TextBox x:Name="TextBoxInputTask" Margin="20,40,125,0" TextWrapping="Wrap" Grid.Column="1" KeyDown="TextBoxInputTask_KeyDown" Height="32" VerticalAlignment="Top" />
         <Button x:Name="AppendTaskButton" Grid.Column="1" Content="追加" Margin="0,40,20,0" Click="AppendTaskButton_Click" Height="32" VerticalAlignment="Top" HorizontalAlignment="Right" Width="100"/>
         <ItemsControl
@@ -33,28 +68,31 @@
                         BorderBrush="{DynamicResource MaterialDesignDivider}"
                         BorderThickness="1">
                         <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <!-- CheckBox -->
-                        <CheckBox
-                            VerticalAlignment="Center"
-                            IsChecked="{Binding Is_Checked}"
-                            Command="{Binding UpdateIsCheckedCommand}" />
-                        <!-- Task Content -->
-                        <TextBlock
-                            Grid.Column="1"
-                            VerticalAlignment="Center"
-                            Text="{Binding Task_Name}"
-                            Margin="8,0,0,0" />
-                        <!-- Delete Button -->
-                        <Button
-                            Grid.Column="2"
-                            Content="削除"
-                            Command="{Binding DeleteCommand}"
-                            Margin="8,0,0,0" />
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <!-- CheckBox -->
+                            <CheckBox
+                                VerticalAlignment="Center"
+                                IsChecked="{Binding Is_Checked}"
+                                Command="{Binding UpdateIsCheckedCommand}" 
+                            />
+                            <!-- Task Content -->
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="{Binding Task_Name}"
+                                Margin="8,0,0,0" 
+                            />
+                            <!-- Delete Button -->
+                            <Button
+                                Grid.Column="2"
+                                Content="削除"
+                                Command="{Binding DeleteCommand}"
+                                Margin="8,0,0,0" 
+                            />
                         </Grid>
                     </Border>
                     <DataTemplate.Triggers>
@@ -64,6 +102,6 @@
                     </DataTemplate.Triggers>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        </ItemsControl>        
     </Grid>
 </Window>
