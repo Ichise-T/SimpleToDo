@@ -33,7 +33,7 @@ namespace SimpleToDo.Test
                 TaskName = "Test Task",
                 IsChecked = true
             };
-            string databaseName = "testdb";
+            string databaseName = "test_todo";
             string tableName = "todo";
             long recordId = 1;
 
@@ -60,7 +60,7 @@ namespace SimpleToDo.Test
             // Assert：結果を検証
             //---------------------
             // Verify the SQL query
-            var expectedQuery = $"UPDATE {tableName} SET Task = @Task, Checked = @Checked WHERE Id = @Id";
+            var expectedQuery = $"UPDATE {tableName} SET task_name = @task_name, is_checked = @is_checked WHERE id = @id";
             Assert.Equal(expectedQuery, mockCommand.Object.CommandText);
 
             // Verify the parameters
@@ -69,13 +69,13 @@ namespace SimpleToDo.Test
 
             // Verify parameter names and values
             mockParameters.Verify(p => p.Add(It.Is<IDbDataParameter>(param =>
-                param.ParameterName == "@Task" && param.Value != null && param.Value.ToString() == "Test Task")), Times.Once);
+                param.ParameterName == "@task_name" && param.Value != null && param.Value.ToString() == "Test task_name")), Times.Once);
 
             mockParameters.Verify(p => p.Add(It.Is<IDbDataParameter>(param =>
-                param.ParameterName == "@Checked" && param.Value != null && (bool)param.Value == true)), Times.Once);
+                param.ParameterName == "@is_checked" && param.Value != null && (bool)param.Value == true)), Times.Once);
 
             mockParameters.Verify(p => p.Add(It.Is<IDbDataParameter>(param =>
-                param.ParameterName == "@Id" && param.Value != null && (long)param.Value == 1)), Times.Once);
+                param.ParameterName == "@id" && param.Value != null && (long)param.Value == 1)), Times.Once);
         }           
     }
 }

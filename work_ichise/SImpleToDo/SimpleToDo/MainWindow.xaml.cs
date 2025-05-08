@@ -37,14 +37,14 @@ namespace SimpleToDo
             dbManager = new DatabaseCrudManager(connectionFactory);
 
             // データベースが無い場合のみ作成
-            string databaseName = ConfigurationManager.AppSettings["DatabaseName"] ?? "SimpleToDo";
+            string databaseName = ConfigurationManager.AppSettings["DatabaseName"] ?? "simple_todo";
             _databaseName = databaseName;
             dbManager.CreateDatabase(_databaseName);
             
             // テーブルが無い場合のみ作成               
-            string tableName = ConfigurationManager.AppSettings["TableName"] ?? "ToDo";
+            string tableName = ConfigurationManager.AppSettings["TableName"] ?? "todo";
             _tableName = tableName;
-            dbManager.CreateTable(_databaseName, _tableName, ["TaskName VARCHAR(250)", "IsChecked BOOLEAN DEFAULT FALSE"]);
+            dbManager.CreateTable(_databaseName, _tableName, ["task_name VARCHAR(250)", "is_checked BOOLEAN DEFAULT FALSE"]);
 
             string? openWeatherApiKey = ConfigurationManager.AppSettings["OpenWeatherApiKey"] ?? "";
             openWeatherApiClient = new(openWeatherApiKey);
@@ -73,7 +73,7 @@ namespace SimpleToDo
 
         private void AppendTaskButton_Click(object sender, RoutedEventArgs e)
         {
-            ToDo toDo = new() { TaskName = TextBoxInputTask.Text };
+            ToDo toDo = new() { Task_Name = TextBoxInputTask.Text };
             long taskId = dbManager.CreateRecord(_databaseName, _tableName, toDo);
             toDo.Id = taskId;
 

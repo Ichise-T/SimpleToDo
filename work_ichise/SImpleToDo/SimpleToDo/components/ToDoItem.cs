@@ -13,20 +13,20 @@ namespace SimpleToDo.components
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         public readonly ToDo _toDo = toDo;
-        public bool IsChecked
+        public bool Is_Checked
         {
-            get => _toDo.IsChecked;
+            get => _toDo.Is_Checked;
             set
             {
-                if (_toDo.IsChecked != value)
+                if (_toDo.Is_Checked != value)
                 {
-                    _toDo.IsChecked = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsChecked)));
+                    _toDo.Is_Checked = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Is_Checked)));
                     UpdateIsCheckedCommand.Execute(null);
                 }
             }
         }
-        public string? TaskName => _toDo.TaskName;
+        public string? Task_Name => _toDo.Task_Name;
         public ICommand UpdateIsCheckedCommand { get; } = new RelayCommand(updateCheckAction);
         public ICommand DeleteCommand { get; } = new RelayCommand(deleteAction);
     }
@@ -64,8 +64,8 @@ namespace SimpleToDo.components
         {
             _updateRecord?.Invoke(_databaseName, _tableName, toDo.Id, new ToDo
             {
-                TaskName = toDo.TaskName,
-                IsChecked = toDo.IsChecked
+                Task_Name = toDo.Task_Name,
+                Is_Checked = toDo.Is_Checked
             });
         }
 

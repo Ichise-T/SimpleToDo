@@ -41,13 +41,13 @@
                         <!-- CheckBox -->
                         <CheckBox
                             VerticalAlignment="Center"
-                            IsChecked="{Binding IsChecked}"
+                            IsChecked="{Binding Is_Checked}"
                             Command="{Binding UpdateIsCheckedCommand}" />
                         <!-- Task Content -->
                         <TextBlock
                             Grid.Column="1"
                             VerticalAlignment="Center"
-                            Text="{Binding TaskName}"
+                            Text="{Binding Task_Name}"
                             Margin="8,0,0,0" />
                         <!-- Delete Button -->
                         <Button
@@ -58,7 +58,7 @@
                         </Grid>
                     </Border>
                     <DataTemplate.Triggers>
-                        <DataTrigger Binding="{Binding IsChecked}" Value="True">
+                        <DataTrigger Binding="{Binding Is_Checked}" Value="True">
                             <Setter TargetName="TaskBorder" Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
                         </DataTrigger>
                     </DataTemplate.Triggers>
