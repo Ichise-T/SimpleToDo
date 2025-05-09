@@ -1,4 +1,4 @@
-﻿namespace SimpleToDo.models
+﻿namespace SimpleToDo.mvvm.models
 {
     public class ToDo
     {

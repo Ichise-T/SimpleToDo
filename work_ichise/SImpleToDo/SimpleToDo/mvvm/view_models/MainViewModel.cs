@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace SimpleToDo.view_models
+namespace SimpleToDo.mvvm.view_models
 {
     public class MainViewModel
     {

@@ -1,10 +1,10 @@
-﻿using SimpleToDo.models;
+﻿using SimpleToDo.mvvm.models;
 using System.Windows.Input;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using SimpleToDo.utils;
 
-namespace SimpleToDo.view_models
+namespace SimpleToDo.mvvm.view_models
 {
     /// <summary>
     /// 単一のToDoアイテムの状態や操作（チェック・削除）を管理するViewModelクラスです。

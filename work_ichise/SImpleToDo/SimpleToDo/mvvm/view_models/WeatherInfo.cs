@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
 
-namespace SimpleToDo.view_models
+namespace SimpleToDo.mvvm.view_models
 {
     public class WeatherInfoItemViewModel(string weatherInfo) 
     {
