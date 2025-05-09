@@ -1,12 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace SimpleToDo.view_models
 {
-    class WeatherInfo
+    public class WeatherInfoItemViewModel(string weatherInfo) 
     {
+        public string WeatherInfo => weatherInfo;
+    }
+
+    public class WeatherInfoViewModel(string weatherInfo)
+    {
+        public ObservableCollection<WeatherInfoItemViewModel> WeatherInfoItems { get; } =
+               [
+                   new WeatherInfoItemViewModel(weatherInfo)
+               ];
     }
 }

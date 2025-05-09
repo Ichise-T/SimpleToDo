@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using SimpleToDo.utils;
 
-namespace SimpleToDo.components
+namespace SimpleToDo.view_models
 {
     /// <summary>
     /// 単一のToDoアイテムの状態や操作（チェック・削除）を管理するViewModelクラスです。
@@ -77,6 +77,6 @@ namespace SimpleToDo.components
                 ToDoItems.Remove(task);
                 _deleteRecord?.Invoke(_databaseName, _tableName, toDo.Id);
             }
-        }
+        }   
     } 
 }

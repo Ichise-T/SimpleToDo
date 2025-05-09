@@ -1,13 +1,12 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 using System.Data;
-using SimpleToDo.components;
+using SimpleToDo.view_models;
 using SimpleToDo.models;
 using SimpleToDo.utils;
 using SimpleToDo.services;
 using MySql.Data.MySqlClient;
 using System.Configuration;
-using System.Diagnostics;
 
 namespace SimpleToDo
 {
@@ -17,7 +16,7 @@ namespace SimpleToDo
 
     public partial class MainWindow : Window
     {
-        private ToDoItemListViewModel? toDoItemListViewModel;
+        private readonly MainViewModel mainViewModel = new();
         private readonly string _databaseName;
         private readonly string _tableName;
         private readonly DatabaseCrudManager dbManager;
@@ -36,18 +35,22 @@ namespace SimpleToDo
             // DatabaseCrudManagerのインスタンスを作成
             dbManager = new DatabaseCrudManager(connectionFactory);
 
-            // データベースが無い場合のみ作成
             string databaseName = ConfigurationManager.AppSettings["DatabaseName"] ?? "simple_todo";
+            string tableName = ConfigurationManager.AppSettings["TableName"] ?? "todo";
+
+            // データベースが無い場合のみ作成
             _databaseName = databaseName;
             dbManager.CreateDatabase(_databaseName);
             
             // テーブルが無い場合のみ作成               
-            string tableName = ConfigurationManager.AppSettings["TableName"] ?? "todo";
             _tableName = tableName;
             dbManager.CreateTable(_databaseName, _tableName, ["task_name VARCHAR(250)", "is_checked BOOLEAN DEFAULT FALSE"]);
 
+            // APIキーを取得
             string? openWeatherApiKey = ConfigurationManager.AppSettings["OpenWeatherApiKey"] ?? "";
             openWeatherApiClient = new(openWeatherApiKey);
+
+            this.DataContext = mainViewModel;
 
             LoadToDoData();
             _ = LoadWeatherInfo();
@@ -61,26 +64,38 @@ namespace SimpleToDo
             List<ToDo> ToDoList = new DataConverter().ConvertDataTableToList(dataTable);
 
             // MainViewModelのインスタンスを作成し、TaskItemsにToDoListを追加
-            toDoItemListViewModel = new ToDoItemListViewModel(
-                _databaseName,
-                _tableName,
-                ToDoList,
-                (db, tbl, id, obj) => dbManager.UpdateRecord(db, tbl, id, obj),
-                (db, tbl, id) => dbManager.DeleteRecord(db, tbl, id)
-            );
-            this.DataContext = toDoItemListViewModel;
+            mainViewModel.ToDoItems.Clear();
+            foreach (var toDoItem in ToDoList)
+            {
+                mainViewModel.ToDoItems.Add(new ToDoItemViewModel(
+                    toDoItem,
+                    () => dbManager.UpdateRecord(_databaseName, _tableName, toDoItem.Id, toDoItem),
+                    () =>
+                    {
+                        dbManager.DeleteRecord(_databaseName, _tableName, toDoItem.Id);
+                        mainViewModel.RemoveToDoItem(
+                            mainViewModel.ToDoItems.First(vm => vm._toDo.Id == toDoItem.Id)
+                        );
+                    }));
+            }
         }
 
         private void AppendTaskButton_Click(object sender, RoutedEventArgs e)
         {
-            ToDo toDo = new() { Task_Name = TextBoxInputTask.Text };
-            long taskId = dbManager.CreateRecord(_databaseName, _tableName, toDo);
-            toDo.Id = taskId;
+            ToDo toDoItem = new() { Task_Name = TextBoxInputTask.Text };
+            long taskId = dbManager.CreateRecord(_databaseName, _tableName, toDoItem);
+            toDoItem.Id = taskId;
 
             // TaskItemsに追加
-            toDoItemListViewModel?.ToDoItems.Add(new ToDoItemViewModel(toDo,
-                () => dbManager.UpdateRecord(_databaseName, _tableName, toDo.Id, toDo),
-                () => dbManager.DeleteRecord(_databaseName, _tableName, toDo.Id)));
+            mainViewModel.ToDoItems.Add(new ToDoItemViewModel(toDoItem,
+                () => dbManager.UpdateRecord(_databaseName, _tableName, toDoItem.Id, toDoItem),
+                () =>
+                {
+                    dbManager.DeleteRecord(_databaseName, _tableName, toDoItem.Id);
+                    mainViewModel.RemoveToDoItem(
+                        mainViewModel.ToDoItems.First(vm => vm._toDo.Id == toDoItem.Id)
+                    );
+                }));
 
             TextBoxInputTask.Text = "";
         }
@@ -96,7 +111,13 @@ namespace SimpleToDo
         private async Task LoadWeatherInfo()
         {
             var weatherInfo = await openWeatherApiClient.GetWeatherInfoAsync("Shiga");
-            Debug.WriteLine($"場所：{weatherInfo.Name}, 天気: {weatherInfo.Description}, 気温: {weatherInfo.Temperature}°C, 湿度: {weatherInfo.Humidity}%");
+            string weatherInfoString =
+                $"場所：{weatherInfo.Name}\n" +
+                $"天気: {weatherInfo.Description}\n" +
+                $"気温: {weatherInfo.Temperature}°C\n" +
+                $"湿度: {weatherInfo.Humidity}%";
+            mainViewModel.WeatherInfoItems.Clear();
+            mainViewModel.WeatherInfoItems.Add(new WeatherInfoItemViewModel(weatherInfoString));
         }
     }
 }

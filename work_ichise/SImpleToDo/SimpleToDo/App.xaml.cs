@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows;
 
-namespace ToDoList
+namespace SimpleToDo
 {
     /// <summary>
     /// Interaction logic for App.xaml

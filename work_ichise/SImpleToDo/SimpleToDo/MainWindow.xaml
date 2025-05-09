@@ -45,63 +45,61 @@
                             />
                         </Grid>
                     </Border>
-                    <DataTemplate.Triggers>
-                        <DataTrigger Binding="{Binding Is_Checked}" Value="True">
-                            <Setter TargetName="WeatherInfoBorder" Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
-                        </DataTrigger>
-                    </DataTemplate.Triggers>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
         <TextBox x:Name="TextBoxInputTask" Margin="20,40,125,0" TextWrapping="Wrap" Grid.Column="1" KeyDown="TextBoxInputTask_KeyDown" Height="32" VerticalAlignment="Top" />
         <Button x:Name="AppendTaskButton" Grid.Column="1" Content="追加" Margin="0,40,20,0" Click="AppendTaskButton_Click" Height="32" VerticalAlignment="Top" HorizontalAlignment="Right" Width="100"/>
-        <ItemsControl
+        <ScrollViewer Grid.Column="1" Margin="20,90,0,0" VerticalScrollBarVisibility="Visible">
+            <ItemsControl
             x:Name="TaskItemsControl"
             Grid.IsSharedSizeScope="True"
-            ItemsSource="{Binding ToDoItems}" Grid.Column="1" Margin="20,90,20,0">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border
+            ItemsSource="{Binding ToDoItems}" Grid.Column="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0,0,25,0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border
                         x:Name="TaskBorder"
                         Padding="8"
                         Margin="4"
                         BorderBrush="{DynamicResource MaterialDesignDivider}"
-                        BorderThickness="1">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <!-- CheckBox -->
-                            <CheckBox
+                        BorderThickness="1"
+                    >
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <!-- CheckBox -->
+                                <CheckBox
                                 VerticalAlignment="Center"
                                 IsChecked="{Binding Is_Checked}"
                                 Command="{Binding UpdateIsCheckedCommand}" 
                             />
-                            <!-- Task Content -->
-                            <TextBlock
+                                <!-- Task Content -->
+                                <TextBlock
                                 Grid.Column="1"
                                 VerticalAlignment="Center"
                                 Text="{Binding Task_Name}"
                                 Margin="8,0,0,0" 
                             />
-                            <!-- Delete Button -->
-                            <Button
+                                <!-- Delete Button -->
+                                <Button
                                 Grid.Column="2"
                                 Content="削除"
                                 Command="{Binding DeleteCommand}"
                                 Margin="8,0,0,0" 
                             />
-                        </Grid>
-                    </Border>
-                    <DataTemplate.Triggers>
-                        <DataTrigger Binding="{Binding Is_Checked}" Value="True">
-                            <Setter TargetName="TaskBorder" Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
-                        </DataTrigger>
-                    </DataTemplate.Triggers>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>        
+                            </Grid>
+                        </Border>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding Is_Checked}" Value="True">
+                                <Setter TargetName="TaskBorder" Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
     </Grid>
 </Window>

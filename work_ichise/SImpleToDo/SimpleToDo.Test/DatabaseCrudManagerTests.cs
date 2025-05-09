@@ -30,8 +30,8 @@ namespace SimpleToDo.Test
 
             ToDo testToDoRecord = new()
             {
-                TaskName = "Test Task",
-                IsChecked = true
+                Task_Name = "Test Task",
+                Is_Checked = true
             };
             string databaseName = "test_todo";
             string tableName = "todo";
