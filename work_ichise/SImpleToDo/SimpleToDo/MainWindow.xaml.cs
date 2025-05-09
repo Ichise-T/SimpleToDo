@@ -1,8 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 using System.Data;
-using SimpleToDo.view_models;
-using SimpleToDo.models;
+using SimpleToDo.mvvm.view_models;
+using SimpleToDo.mvvm.models;
 using SimpleToDo.utils;
 using SimpleToDo.services;
 using MySql.Data.MySqlClient;
@@ -13,90 +13,47 @@ namespace SimpleToDo
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-
     public partial class MainWindow : Window
     {
-        private readonly MainViewModel mainViewModel = new();
-        private readonly string _databaseName;
-        private readonly string _tableName;
-        private readonly DatabaseCrudManager dbManager;
-        private readonly OpenWeatherApiClient openWeatherApiClient;
+        private readonly MainViewModel _mainViewModel;
         
         public MainWindow()
         {
             InitializeComponent();
 
-            // データベース接続文字列を取得
-            string connectionStrings = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
-
-            // MySqlConnectionのファクトリメソッドを作成
-            IDbConnection connectionFactory() => new MySqlConnection(connectionStrings);
-
-            // DatabaseCrudManagerのインスタンスを作成
-            dbManager = new DatabaseCrudManager(connectionFactory);
-
+            // データベースとAPI設定を初期化
+            string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
             string databaseName = ConfigurationManager.AppSettings["DatabaseName"] ?? "simple_todo";
             string tableName = ConfigurationManager.AppSettings["TableName"] ?? "todo";
-
-            // データベースが無い場合のみ作成
-            _databaseName = databaseName;
-            dbManager.CreateDatabase(_databaseName);
+            string openWeatherApiKey = ConfigurationManager.AppSettings["OpenWeatherApiKey"] ?? "";
             
-            // テーブルが無い場合のみ作成               
-            _tableName = tableName;
-            dbManager.CreateTable(_databaseName, _tableName, ["task_name VARCHAR(250)", "is_checked BOOLEAN DEFAULT FALSE"]);
-
-            // APIキーを取得
-            string? openWeatherApiKey = ConfigurationManager.AppSettings["OpenWeatherApiKey"] ?? "";
-            openWeatherApiClient = new(openWeatherApiKey);
-
-            this.DataContext = mainViewModel;
-
-            LoadToDoData();
-            _ = LoadWeatherInfo();
-
+            // ViewModelを初期化
+            _mainViewModel = new MainViewModel(connectionString, databaseName, tableName, openWeatherApiKey);
+            DataContext = _mainViewModel;
+            
+            // 初期データの読み込み
+            _mainViewModel.LoadToDoDataAsync();
+            
+            // 非同期で天気情報を読み込む（イベントハンドラに移動）
+            Loaded += MainWindow_Loaded;
         }
 
-        private void LoadToDoData()
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            DataTable dataTable = dbManager.ReadAllRecord(_databaseName, _tableName);
-
-            List<ToDo> ToDoList = new DataConverter().ConvertDataTableToList(dataTable);
-
-            // MainViewModelのインスタンスを作成し、TaskItemsにToDoListを追加
-            mainViewModel.ToDoItems.Clear();
-            foreach (var toDoItem in ToDoList)
+            try
             {
-                mainViewModel.ToDoItems.Add(new ToDoItemViewModel(
-                    toDoItem,
-                    () => dbManager.UpdateRecord(_databaseName, _tableName, toDoItem.Id, toDoItem),
-                    () =>
-                    {
-                        dbManager.DeleteRecord(_databaseName, _tableName, toDoItem.Id);
-                        mainViewModel.RemoveToDoItem(
-                            mainViewModel.ToDoItems.First(vm => vm._toDo.Id == toDoItem.Id)
-                        );
-                    }));
+                await _mainViewModel.LoadWeatherInfoAsync();
+            }
+            catch (Exception ex)
+            {
+                // UIスレッドで例外をキャッチして処理できる
+                _mainViewModel.ErrorMessage = $"天気情報の読み込み中にエラーが発生しました: {ex.Message}";
             }
         }
 
-        private void AppendTaskButton_Click(object sender, RoutedEventArgs e)
+        private async void AppendTaskButton_Click(object sender, RoutedEventArgs e)
         {
-            ToDo toDoItem = new() { Task_Name = TextBoxInputTask.Text };
-            long taskId = dbManager.CreateRecord(_databaseName, _tableName, toDoItem);
-            toDoItem.Id = taskId;
-
-            // TaskItemsに追加
-            mainViewModel.ToDoItems.Add(new ToDoItemViewModel(toDoItem,
-                () => dbManager.UpdateRecord(_databaseName, _tableName, toDoItem.Id, toDoItem),
-                () =>
-                {
-                    dbManager.DeleteRecord(_databaseName, _tableName, toDoItem.Id);
-                    mainViewModel.RemoveToDoItem(
-                        mainViewModel.ToDoItems.First(vm => vm._toDo.Id == toDoItem.Id)
-                    );
-                }));
-
+            await _mainViewModel.AddToDoItemAsync(TextBoxInputTask.Text);
             TextBoxInputTask.Text = "";
         }
 
@@ -106,18 +63,6 @@ namespace SimpleToDo
             {
                 AppendTaskButton_Click(sender, e);
             }
-        }
-
-        private async Task LoadWeatherInfo()
-        {
-            var weatherInfo = await openWeatherApiClient.GetWeatherInfoAsync("Shiga");
-            string weatherInfoString =
-                $"場所：{weatherInfo.Name}\n" +
-                $"天気: {weatherInfo.Description}\n" +
-                $"気温: {weatherInfo.Temperature}°C\n" +
-                $"湿度: {weatherInfo.Humidity}%";
-            mainViewModel.WeatherInfoItems.Clear();
-            mainViewModel.WeatherInfoItems.Add(new WeatherInfoItemViewModel(weatherInfoString));
         }
     }
 }

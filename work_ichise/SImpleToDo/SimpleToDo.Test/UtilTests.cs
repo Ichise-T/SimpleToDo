@@ -1,5 +1,5 @@
 ﻿using System.Data;
-using SimpleToDo.models;
+using SimpleToDo.mvvm.models;
 using SimpleToDo.utils;
 
 namespace SimpleToDo.Test
