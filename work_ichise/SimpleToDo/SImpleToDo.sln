@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleToDo", "SimpleToDo\SimpleToDo.csproj", "{7FEDD95F-3D03-4E35-FA53-5EAC296DFD0D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleToDo.Test", "SimpleToDo.Test\SimpleToDo.Test.csproj", "{CFF662EF-C227-477B-E6EC-B13CFD5D7096}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7FEDD95F-3D03-4E35-FA53-5EAC296DFD0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FEDD95F-3D03-4E35-FA53-5EAC296DFD0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FEDD95F-3D03-4E35-FA53-5EAC296DFD0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FEDD95F-3D03-4E35-FA53-5EAC296DFD0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFF662EF-C227-477B-E6EC-B13CFD5D7096}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFF662EF-C227-477B-E6EC-B13CFD5D7096}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFF662EF-C227-477B-E6EC-B13CFD5D7096}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFF662EF-C227-477B-E6EC-B13CFD5D7096}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AC081ED4-D823-4454-B3F2-C394B1539ACC}
+	EndGlobalSection
+EndGlobal

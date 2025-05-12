@@ -1,0 +1,27 @@
+# user
+*.vs
+*.suo
+*.userosscache
+*.sln.docstates
+
+# packages
+packages/
+
+# bild
+[Bb]in/
+[Oo]bj/
+
+# test
+[Tt]est[Rr]esult*/
+
+# log
+*.log
+
+# config
+App.config
+
+# Properties
+Properties/
+
+# Visual Studio user-specific files
+*.csproj.user

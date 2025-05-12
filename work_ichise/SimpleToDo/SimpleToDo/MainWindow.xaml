@@ -1,0 +1,105 @@
+﻿<Window x:Class="SimpleToDo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SimpleToDo"
+        mc:Ignorable="d"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        TextElement.FontWeight="Medium"
+        TextElement.FontSize="14"
+        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
+        Title="タスク管理アプリ" Height="625" Width="876">
+    <Grid Margin="0,10,0,3">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition MinWidth="290"/>
+            <ColumnDefinition Width="387*"/>
+        </Grid.ColumnDefinitions>
+        <Calendar x:Name="Calendar" Margin="20,40,0,0" Cursor="AppStarting" MinHeight="350" VerticalAlignment="Top" MinWidth="250" HorizontalAlignment="Left" Width="250"/>
+        <ItemsControl
+            x:Name="WeatherInfo"
+            Grid.IsSharedSizeScope="True"
+            ItemsSource="{Binding WeatherInfoItems}" Margin="20,395,20,0">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border
+                        x:Name="WeatherInfoBorder"
+                        Padding="8"
+                        Margin="4"
+                        BorderBrush="{DynamicResource MaterialDesignDivider}"
+                        BorderThickness="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Text="{Binding WeatherInfo}"
+                            />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <TextBox x:Name="TextBoxInputTask" Margin="20,40,125,0" TextWrapping="Wrap" Grid.Column="1" KeyDown="TextBoxInputTask_KeyDown" Height="32" VerticalAlignment="Top" />
+        <Button x:Name="AppendTaskButton" Grid.Column="1" Content="追加" Margin="0,40,20,0" Click="AppendTaskButton_Click" Height="32" VerticalAlignment="Top" HorizontalAlignment="Right" Width="100"/>
+        <ScrollViewer Grid.Column="1" Margin="20,90,0,0" VerticalScrollBarVisibility="Visible">
+            <ItemsControl
+            x:Name="TaskItemsControl"
+            Grid.IsSharedSizeScope="True"
+            ItemsSource="{Binding ToDoItems}" Grid.Column="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0,0,25,0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border
+                        x:Name="TaskBorder"
+                        Padding="8"
+                        Margin="4"
+                        BorderBrush="{DynamicResource MaterialDesignDivider}"
+                        BorderThickness="1"
+                    >
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <!-- CheckBox -->
+                                <CheckBox
+                                VerticalAlignment="Center"
+                                IsChecked="{Binding Is_Checked}"
+                                Command="{Binding UpdateIsCheckedCommand}" 
+                            />
+                                <!-- Task Content -->
+                                <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="{Binding Task_Name}"
+                                Margin="8,0,0,0" 
+                            />
+                                <!-- Delete Button -->
+                                <Button
+                                Grid.Column="2"
+                                Content="削除"
+                                Command="{Binding DeleteCommand}"
+                                Margin="8,0,0,0" 
+                            />
+                            </Grid>
+                        </Border>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding Is_Checked}" Value="True">
+                                <Setter TargetName="TaskBorder" Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</Window>
