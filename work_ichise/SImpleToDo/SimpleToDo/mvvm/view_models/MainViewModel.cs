@@ -1,26 +1,52 @@
 ﻿using System.Collections.ObjectModel;
 using System.Data;
 using SimpleToDo.mvvm.models;
-using SimpleToDo.services;
+using SimpleToDo.services.database;
+using SimpleToDo.services.open_weather_map;
 using SimpleToDo.utils;
 using MySql.Data.MySqlClient;
 using System.ComponentModel;
-using System.Data.Common;
+using SimpleToDo.services.database.interfaces;
+using SimpleToDo.services.database.wrappers;
 
 namespace SimpleToDo.mvvm.view_models
 {
+    /// <summary>
+    /// アプリ全体の状態やToDoリスト・天気情報の管理を行うメインViewModelクラス。
+    /// データベースやAPIとの連携、エラー管理、コレクションの操作などを担当します。
+    /// </summary>
     public class MainViewModel : INotifyPropertyChanged
     {
+        /// <summary>
+        /// プロパティ変更通知イベント（INotifyPropertyChangedの実装）
+        /// </summary>
         public event PropertyChangedEventHandler? PropertyChanged;
+
+        /// <summary>
+        /// 天気情報のViewModelコレクション
+        /// </summary>
         public ObservableCollection<WeatherInfoItemViewModel> WeatherInfoItems { get; set; } = [];
+
+        /// <summary>
+        /// ToDoアイテムのViewModelコレクション
+        /// </summary>
         public ObservableCollection<ToDoItemViewModel> ToDoItems { get; set; } = [];
         
+        // データベース操作用マネージャ
         private readonly DatabaseCrudManager _dbManager;
-        private readonly OpenWeatherApiClient _weatherApiClient;
+        // 天気情報APIクライアント
+        private readonly OpenWeatherMapApiClient _weatherApiClient;
+        // データベース名
         private readonly string _databaseName;
+        // テーブル名
         private readonly string _tableName;
         
+        // エラーメッセージ
         private string _errorMessage = string.Empty;
+
+        /// <summary>
+        /// エラーメッセージ（UIバインディング用）
+        /// </summary>
         public string ErrorMessage 
         { 
             get => _errorMessage;
@@ -31,16 +57,23 @@ namespace SimpleToDo.mvvm.view_models
             }
         }
         
+        /// <summary>
+        /// MainViewModelのコンストラクタ。DBやAPIクライアントの初期化、テーブル作成などを行います。
+        /// </summary>
+        /// <param name="connectionString">DB接続文字列</param>
+        /// <param name="databaseName">データベース名</param>
+        /// <param name="tableName">テーブル名</param>
+        /// <param name="apiKey">OpenWeatherMap APIキー</param>
         public MainViewModel(string connectionString, string databaseName, string tableName, string apiKey)
         {
             _databaseName = databaseName;
             _tableName = tableName;
-            
+
             // データベース接続の初期化
-            Task<DbConnection> connectionFactory() 
-            {
-                return Task.FromResult<DbConnection>(new MySqlConnection(connectionString));
-            }
+            Task<IDbConnectionWrapper> connectionFactory() =>
+                Task.FromResult<IDbConnectionWrapper>(
+                    new DbConnectionWrapper(new MySqlConnection(connectionString))
+                );
             _dbManager = new DatabaseCrudManager(connectionFactory);
             
             try
@@ -60,9 +93,12 @@ namespace SimpleToDo.mvvm.view_models
             }
             
             // 天気情報APIクライアントの初期化
-            _weatherApiClient = new OpenWeatherApiClient(apiKey);
+            _weatherApiClient = new OpenWeatherMapApiClient(apiKey);
         }
         
+        /// <summary>
+        /// ToDoデータをデータベースから読み込み、コレクションに反映します。
+        /// </summary>
         public async void LoadToDoDataAsync()
         {
             try
@@ -82,6 +118,10 @@ namespace SimpleToDo.mvvm.view_models
             }
         }
         
+        /// <summary>
+        /// 新しいToDoアイテムを追加し、データベースとコレクションを更新します。
+        /// </summary>
+        /// <param name="taskName">追加するタスク名</param>
         public async Task AddToDoItemAsync(string taskName)
         {
             if (string.IsNullOrWhiteSpace(taskName))
@@ -101,6 +141,10 @@ namespace SimpleToDo.mvvm.view_models
             }
         }
         
+        /// <summary>
+        /// ToDoモデルをViewModelに変換し、コレクションに追加します。
+        /// </summary>
+        /// <param name="toDoItem">追加するToDoモデル</param>
         private void AddToDoItemToCollection(ToDo toDoItem)
         {
             ToDoItems.Add(new ToDoItemViewModel(
@@ -110,6 +154,10 @@ namespace SimpleToDo.mvvm.view_models
             ));
         }
         
+        /// <summary>
+        /// ToDoアイテムの内容を更新し、データベースに反映します。
+        /// </summary>
+        /// <param name="toDoItem">更新対象のToDoモデル</param>
         private async Task UpdateToDoItemAsync(ToDo toDoItem)
         {
             try
@@ -122,6 +170,10 @@ namespace SimpleToDo.mvvm.view_models
             }
         }
         
+        /// <summary>
+        /// ToDoアイテムを削除し、データベースとコレクションから除去します。
+        /// </summary>
+        /// <param name="toDoItem">削除対象のToDoモデル</param>
         private async void DeleteToDoItemAsync(ToDo toDoItem)
         {
             try
@@ -139,11 +191,18 @@ namespace SimpleToDo.mvvm.view_models
             }
         }
         
+        /// <summary>
+        /// ToDoアイテムのViewModelをコレクションから削除します（UI操作用）。
+        /// </summary>
+        /// <param name="item">削除するViewModel</param>
         public void RemoveToDoItem(ToDoItemViewModel item)
         {
             ToDoItems.Remove(item);
         }
         
+        /// <summary>
+        /// 天気情報をAPIから取得し、コレクションに反映します。
+        /// </summary>
         public async Task LoadWeatherInfoAsync()
         {
             try
@@ -164,6 +223,10 @@ namespace SimpleToDo.mvvm.view_models
             }
         }
         
+        /// <summary>
+        /// プロパティ変更通知を発行します。
+        /// </summary>
+        /// <param name="propertyName">変更されたプロパティ名</param>
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
