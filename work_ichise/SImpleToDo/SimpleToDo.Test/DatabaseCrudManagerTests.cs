@@ -1,7 +1,8 @@
 ﻿using Moq;
 using SimpleToDo.services;
 using System.Data;
-using SimpleToDo.models;
+using SimpleToDo.mvvm.models;
+using System.Data.Common;
 
 namespace SimpleToDo.Test
 {
@@ -14,18 +15,18 @@ namespace SimpleToDo.Test
         /// UpdateRecordメソッドが正しいSQLクエリを構築し、適切なパラメータを追加しているかを検証します。
         /// </summary>
         [Fact(DisplayName = "UpdateRecordは正しいクエリを構築し、パラメータを追加する必要がある")]
-        public static void UpdateRecordShouldConstructCorrectQueryAndAddParameters()
+        public static async void UpdateRecordShouldConstructCorrectQueryAndAddParameters()
         {
             //----------------------
             // Arrange：テスト準備
             //----------------------
-            var mockConnection = new Mock<IDbConnection>();
-            var mockCommand = new Mock<IDbCommand>();
+            var mockConnection = new Mock<DbConnection>();
+            var mockCommand = new Mock<DbCommand>();
             mockConnection.Setup(c => c.CreateCommand()).Returns(mockCommand.Object);
-            var mockParameters = new Mock<IDataParameterCollection>();
+            var mockParameters = new Mock<DbParameterCollection>();
             mockCommand.Setup(c => c.Parameters).Returns(mockParameters.Object);
 
-            var connectionFactory = new Func<IDbConnection>(() => mockConnection.Object);
+            var connectionFactory = new Func<Task<DbConnection>>(() => Task.FromResult(mockConnection.Object));
             var dbManager = new DatabaseCrudManager(connectionFactory);
 
             ToDo testToDoRecord = new()
@@ -54,7 +55,7 @@ namespace SimpleToDo.Test
             //----------------------------------
             // Act：テスト対象のメソッドを実行
             //----------------------------------
-            dbManager.UpdateRecord(databaseName, tableName, recordId, testToDoRecord);
+            await dbManager.UpdateRecordAsync(databaseName, tableName, recordId, testToDoRecord);
 
             //---------------------
             // Assert：結果を検証
