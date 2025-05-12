@@ -20,4 +20,8 @@ packages/
 # config
 App.config
 
-# etc
+# Properties
+Properties/
+
+# Visual Studio user-specific files
+*.csproj.user
