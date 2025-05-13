@@ -50,8 +50,8 @@ namespace SimpleToDo.services.database.wrappers
         /// </summary>
         public void Dispose()
         {
-            _connection.Dispose();
-            GC.SuppressFinalize(this);
+            _connection.Dispose(); // DbConnectionを解放
+            GC.SuppressFinalize(this); // ガベージコレクションを抑制
         }
     }
 }
