@@ -58,12 +58,11 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Border
-                        x:Name="TaskBorder"
-                        Padding="8"
-                        Margin="4"
-                        BorderBrush="{DynamicResource MaterialDesignDivider}"
-                        BorderThickness="1"
-                    >
+                            x:Name="TaskBorder"
+                            Padding="8"
+                            Margin="4"
+                            BorderBrush="{DynamicResource MaterialDesignDivider}"
+                            BorderThickness="1">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
