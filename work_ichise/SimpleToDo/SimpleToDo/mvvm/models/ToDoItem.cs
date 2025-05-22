@@ -4,7 +4,7 @@
     /// ToDoリストの1件分のデータを表すモデルクラス。
     /// タスクのID、内容、完了状態を保持します。
     /// </summary>
-    public class ToDo
+    public class ToDoItem
     {
         /// <summary>
         /// タスクの一意なID
@@ -14,11 +14,11 @@
         /// <summary>
         /// タスクの内容（タイトルや説明）
         /// </summary>
-        public string? Task_Name { get; set; }
+        public string Task_Name { get; set; } = string.Empty;
 
         /// <summary>
         /// タスクが完了しているかどうか
         /// </summary>
-        public bool Is_Checked { get; set; } = false;
+        public bool Is_Checked { get; set; }
     }
 }

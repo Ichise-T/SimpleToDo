@@ -7,7 +7,7 @@ namespace SimpleToDo.Test
     /// <summary>
     /// ユーティリティクラスの単体テストをまとめたクラス。
     /// </summary>
-    public class UtilTests
+    public class DataConverterTests
     {
         /// <summary>
         /// DataTableからToDoリストへの変換が正しく行われるかをテストします。
@@ -25,7 +25,7 @@ namespace SimpleToDo.Test
             dataTable.Rows.Add(2, "Task 2", false);
 
             // Act: DataConverterでDataTableをToDoリストに変換
-            List<ToDo> result = new DataConverter().ConvertDataTableToList(dataTable);
+            List<ToDoItem> result = new DataConverter().ConvertDataTableToList(dataTable);
 
             // Assert: 変換結果が期待通りか検証
             Assert.Equal(2, result.Count);

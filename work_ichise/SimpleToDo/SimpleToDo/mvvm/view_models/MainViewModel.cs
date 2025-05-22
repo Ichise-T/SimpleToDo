@@ -2,7 +2,7 @@
 using System.Data;
 using SimpleToDo.mvvm.models;
 using SimpleToDo.services.database;
-using SimpleToDo.services.open_weather_map;
+using SimpleToDo.services.weather;
 using SimpleToDo.utils;
 using MySql.Data.MySqlClient;
 using System.ComponentModel;
@@ -25,17 +25,17 @@ namespace SimpleToDo.mvvm.view_models
         /// <summary>
         /// 天気情報のViewModelコレクション
         /// </summary>
-        public ObservableCollection<WeatherInfoItemViewModel> WeatherInfoItems { get; set; } = [];
+        public ObservableCollection<WeatherInfoItemViewModel> WeatherInfoItems { get; } = [];
 
         /// <summary>
         /// ToDoアイテムのViewModelコレクション
         /// </summary>
-        public ObservableCollection<ToDoItemViewModel> ToDoItems { get; set; } = [];
+        public ObservableCollection<ToDoItemViewModel> ToDoItems { get; } = [];
         
         // データベース操作用マネージャ
         private readonly DatabaseCrudManager _dbManager;
         // 天気情報APIクライアント
-        private readonly OpenWeatherMapApiClient _weatherApiClient;
+        private readonly OpenWeatherMapApiClient _weatherClient;
         // データベース名
         private readonly string _databaseName;
         // テーブル名
@@ -52,13 +52,16 @@ namespace SimpleToDo.mvvm.view_models
             get => _errorMessage;
             set
             {
-                _errorMessage = value;
-                OnPropertyChanged(nameof(ErrorMessage));
+                if (_errorMessage != value)
+                {
+                    _errorMessage = value;
+                    OnPropertyChanged(nameof(ErrorMessage));
+                }
             }
         }
         
         /// <summary>
-        /// MainViewModelのコンストラクタ。DBやAPIクライアントの初期化、テーブル作成などを行います。
+        /// MainViewModelのコンストラクタ。DBやAPIクライアントの初期化を行います。
         /// </summary>
         /// <param name="connectionString">DB接続文字列</param>
         /// <param name="databaseName">データベース名</param>
@@ -70,41 +73,44 @@ namespace SimpleToDo.mvvm.view_models
             _tableName = tableName;
 
             // データベース接続の初期化
-            Task<IDbConnectionWrapper> connectionFactory() =>
+            _dbManager = new DatabaseCrudManager(() => 
                 Task.FromResult<IDbConnectionWrapper>(
                     new DbConnectionWrapper(new MySqlConnection(connectionString))
-                );
-            _dbManager = new DatabaseCrudManager(connectionFactory);
+                ));
             
+            // 天気情報APIクライアントの初期化
+            _weatherClient = new OpenWeatherMapApiClient(apiKey);
+            
+            // データベースの初期化を開始（非同期で実行）
+            _ = InitializeDatabaseAsync();
+        }
+
+        /// <summary>
+        /// データベースの初期化を非同期で実行します
+        /// </summary>
+        private async Task InitializeDatabaseAsync()
+        {
             try
             {
-                // 非同期メソッドを同期的に初期化（実際はコンストラクタを非同期にできないため）
-                // このように同期的に待機するのは、UIスレッドでのデッドロックの可能性があるため注意
-                Task.Run(async () => 
-                {
-                    await _dbManager.CreateDatabaseAsync(_databaseName);
-                    await _dbManager.CreateTableAsync(_databaseName, _tableName, 
-                        ["task_name VARCHAR(250)", "is_checked BOOLEAN DEFAULT FALSE"]);
-                }).GetAwaiter().GetResult();
+                await _dbManager.CreateDatabaseAsync(_databaseName);
+                await _dbManager.CreateTableAsync(_databaseName, _tableName, 
+                    ["task_name VARCHAR(250)", "is_checked BOOLEAN DEFAULT FALSE"]);
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"データベース初期化エラー: {ex.Message}";
+                HandleException(ex, "データベース初期化");
             }
-            
-            // 天気情報APIクライアントの初期化
-            _weatherApiClient = new OpenWeatherMapApiClient(apiKey);
         }
         
         /// <summary>
         /// ToDoデータをデータベースから読み込み、コレクションに反映します。
         /// </summary>
-        public async void LoadToDoDataAsync()
+        public async Task LoadToDoDataAsync()
         {
             try
             {
-                DataTable dataTable =  await _dbManager.ReadAllRecordAsync(_databaseName, _tableName);
-                List<ToDo> toDoList = new DataConverter().ConvertDataTableToList(dataTable);
+                DataTable dataTable = await _dbManager.ReadAllRecordAsync(_databaseName, _tableName);
+                List<ToDoItem> toDoList = new DataConverter().ConvertDataTableToList(dataTable);
                 
                 ToDoItems.Clear();
                 foreach (var toDoItem in toDoList)
@@ -114,7 +120,7 @@ namespace SimpleToDo.mvvm.view_models
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"データ読み込みエラー: {ex.Message}";
+                HandleException(ex, "データ読み込み");
             }
         }
         
@@ -129,7 +135,7 @@ namespace SimpleToDo.mvvm.view_models
 
             try
             {
-                ToDo toDoItem = new() { Task_Name = taskName };
+                ToDoItem toDoItem = new() { Task_Name = taskName };
                 long taskId = await _dbManager.CreateRecordAsync(_databaseName, _tableName, toDoItem);
                 toDoItem.Id = taskId;
                 
@@ -137,7 +143,7 @@ namespace SimpleToDo.mvvm.view_models
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"タスク追加エラー: {ex.Message}";
+                HandleException(ex, "タスク追加");
             }
         }
         
@@ -145,11 +151,11 @@ namespace SimpleToDo.mvvm.view_models
         /// ToDoモデルをViewModelに変換し、コレクションに追加します。
         /// </summary>
         /// <param name="toDoItem">追加するToDoモデル</param>
-        private void AddToDoItemToCollection(ToDo toDoItem)
+        private void AddToDoItemToCollection(ToDoItem toDoItem)
         {
             ToDoItems.Add(new ToDoItemViewModel(
                 toDoItem,
-                async () => await  UpdateToDoItemAsync(toDoItem),
+                async () => await UpdateToDoItemAsync(toDoItem),
                 () => DeleteToDoItemAsync(toDoItem)
             ));
         }
@@ -158,7 +164,7 @@ namespace SimpleToDo.mvvm.view_models
         /// ToDoアイテムの内容を更新し、データベースに反映します。
         /// </summary>
         /// <param name="toDoItem">更新対象のToDoモデル</param>
-        private async Task UpdateToDoItemAsync(ToDo toDoItem)
+        private async Task UpdateToDoItemAsync(ToDoItem toDoItem)
         {
             try
             {
@@ -166,7 +172,7 @@ namespace SimpleToDo.mvvm.view_models
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"タスク更新エラー: {ex.Message}";
+                HandleException(ex, "タスク更新");
             }
         }
         
@@ -174,12 +180,12 @@ namespace SimpleToDo.mvvm.view_models
         /// ToDoアイテムを削除し、データベースとコレクションから除去します。
         /// </summary>
         /// <param name="toDoItem">削除対象のToDoモデル</param>
-        private async void DeleteToDoItemAsync(ToDo toDoItem)
+        private async Task DeleteToDoItemAsync(ToDoItem toDoItem)
         {
             try
             {
                 await _dbManager.DeleteRecordAsync(_databaseName, _tableName, toDoItem.Id);
-                var itemToRemove = ToDoItems.FirstOrDefault(vm => vm._toDo.Id == toDoItem.Id);
+                var itemToRemove = ToDoItems.FirstOrDefault(vm => vm._toDoItem.Id == toDoItem.Id);
                 if (itemToRemove != null)
                 {
                     ToDoItems.Remove(itemToRemove);
@@ -187,17 +193,8 @@ namespace SimpleToDo.mvvm.view_models
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"タスク削除エラー: {ex.Message}";
+                HandleException(ex, "タスク削除");
             }
-        }
-        
-        /// <summary>
-        /// ToDoアイテムのViewModelをコレクションから削除します（UI操作用）。
-        /// </summary>
-        /// <param name="item">削除するViewModel</param>
-        public void RemoveToDoItem(ToDoItemViewModel item)
-        {
-            ToDoItems.Remove(item);
         }
         
         /// <summary>
@@ -207,7 +204,7 @@ namespace SimpleToDo.mvvm.view_models
         {
             try
             {
-                var weatherInfo = await _weatherApiClient.GetWeatherInfoAsync("Shiga");
+                var weatherInfo = await _weatherClient.GetWeatherResponseAsync("Shiga");
                 string weatherInfoString =
                     $"場所：{weatherInfo.Name}\n" +
                     $"天気: {weatherInfo.Description}\n" +
@@ -219,8 +216,16 @@ namespace SimpleToDo.mvvm.view_models
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"天気情報取得エラー: {ex.Message}";
+                HandleException(ex, "天気情報取得");
             }
+        }
+
+        /// <summary>
+        /// 集約化されたエラーハンドリング
+        /// </summary>
+        private void HandleException(Exception ex, string operation)
+        {
+            ErrorMessage = $"{operation}エラー: {ex.Message}";
         }
         
         /// <summary>

@@ -26,6 +26,6 @@
         <views:WeatherInfo Margin="20,395,20,0" DataContext="{Binding}"/>
 
         <!-- ToDoリスト部分を別コントロールとして配置 -->
-        <views:ToDo Grid.Column="1" Margin="20,40,20,0" DataContext="{Binding}"/>
+        <views:ToDo Grid.Column="1" Margin="20,40,0,0" DataContext="{Binding}"/>
     </Grid>
 </Window>

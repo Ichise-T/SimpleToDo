@@ -33,7 +33,7 @@ namespace SimpleToDo.Test
             var dbManager = new DatabaseCrudManager(connectionFactory);
 
             // テスト用ToDoレコード
-            ToDo testToDoRecord = new()
+            ToDoItem testToDoRecord = new()
             {
                 Task_Name = "test task 10",
                 Is_Checked = true

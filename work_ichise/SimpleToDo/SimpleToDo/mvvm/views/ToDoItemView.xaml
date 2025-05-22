@@ -6,8 +6,11 @@
              xmlns:local="clr-namespace:SimpleToDo.mvvm.views"
              mc:Ignorable="d">
     <Grid>
-        <TextBox x:Name="TextBoxInputTask" Margin="0,0,105,0" TextWrapping="Wrap" KeyDown="TextBoxInputTask_KeyDown" Height="32" VerticalAlignment="Top" />
-        <Button x:Name="AppendTaskButton" Content="追加" Margin="0,0,0,0" Click="AppendTaskButton_Click" Height="32" VerticalAlignment="Top" HorizontalAlignment="Right" Width="100"/>
+        <!-- 入力エリア -->
+        <TextBox x:Name="TextBoxInputTask" Margin="0,0,125,0" TextWrapping="Wrap" KeyDown="TextBoxInputTask_KeyDown" Height="32" VerticalAlignment="Top" />
+        <Button x:Name="AppendTaskButton" Content="追加" Margin="0,0,20,0" Click="AppendTaskButton_Click" Height="32" VerticalAlignment="Top" HorizontalAlignment="Right" Width="100"/>
+
+        <!-- タスクリスト -->
         <ScrollViewer Margin="0,50,0,0" VerticalScrollBarVisibility="Visible">
             <ItemsControl
             x:Name="TaskItemsControl"
@@ -27,26 +30,29 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
+
                                 <!-- CheckBox -->
                                 <CheckBox
-                                VerticalAlignment="Center"
-                                IsChecked="{Binding Is_Checked}"
-                                Command="{Binding UpdateIsCheckedCommand}" 
-                            />
+                                    VerticalAlignment="Center"
+                                    IsChecked="{Binding Is_Checked}"
+                                    Command="{Binding UpdateIsCheckedCommand}" 
+                                />
+
                                 <!-- Task Content -->
                                 <TextBlock
-                                Grid.Column="1"
-                                VerticalAlignment="Center"
-                                Text="{Binding Task_Name}"
-                                Margin="8,0,0,0" 
-                            />
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding Task_Name}"
+                                    Margin="8,0,0,0" 
+                                />
+
                                 <!-- Delete Button -->
                                 <Button
-                                Grid.Column="2"
-                                Content="削除"
-                                Command="{Binding DeleteCommand}"
-                                Margin="8,0,0,0" 
-                            />
+                                    Grid.Column="2"
+                                    Content="削除"
+                                    Command="{Binding DeleteCommand}"
+                                    Margin="8,0,0,0" 
+                                />
                             </Grid>
                         </Border>
                         <DataTemplate.Triggers>

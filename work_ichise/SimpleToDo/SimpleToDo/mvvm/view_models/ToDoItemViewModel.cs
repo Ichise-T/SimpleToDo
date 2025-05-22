@@ -18,28 +18,30 @@ namespace SimpleToDo.mvvm.view_models
         /// <summary>
         /// 管理対象のToDoモデル
         /// </summary>
-        public readonly ToDo _toDo;
+        public readonly ToDoItem _toDoItem;
 
         /// <summary>
-        /// チェック状態更新時に呼び出すアクション
+        /// チェック状態更新時に呼び出す非同期処理
         /// </summary>
-        private readonly Action _updateCheckAction;
+        private readonly Func<Task> _updateCheckAction;
 
         /// <summary>
-        /// 削除時に呼び出すアクション
+        /// 削除時に呼び出す非同期処理
         /// </summary>
-        private readonly Action _deleteAction;
+        private readonly Func<Task> _deleteAction;
         
         /// <summary>
         /// ToDoモデル・コマンド・アクションを受け取ってViewModelを初期化します。
         /// </summary>
-        public ToDoItemViewModel(ToDo toDo, Action updateCheckAction, Action deleteAction)
+        public ToDoItemViewModel(ToDoItem toDoItem, Func<Task> updateCheckAction, Func<Task> deleteAction)
         {
-            _toDo = toDo;
-            _updateCheckAction = updateCheckAction;
-            _deleteAction = deleteAction;
-            UpdateIsCheckedCommand = new RelayCommand(_updateCheckAction); // チェック状態変更コマンド
-            DeleteCommand = new RelayCommand(_deleteAction);               // 削除コマンド
+            _toDoItem = toDoItem ?? throw new ArgumentNullException(nameof(toDoItem));
+            _updateCheckAction = updateCheckAction ?? throw new ArgumentNullException(nameof(updateCheckAction));
+            _deleteAction = deleteAction ?? throw new ArgumentNullException(nameof(deleteAction));
+            
+            // チェック状態変更コマンドと削除コマンドを初期化
+            UpdateIsCheckedCommand = new AsyncRelayCommand(ExecuteUpdateIsCheckedAsync);
+            DeleteCommand = new AsyncRelayCommand(ExecuteDeleteAsync);
         }
         
         /// <summary>
@@ -48,22 +50,22 @@ namespace SimpleToDo.mvvm.view_models
         /// </summary>
         public bool Is_Checked
         {
-            get => _toDo.Is_Checked;
+            get => _toDoItem.Is_Checked;
             set
             {
-                if (_toDo.Is_Checked != value)
-                {
-                    _toDo.Is_Checked = value;
-                    OnPropertyChanged(nameof(Is_Checked));
-                    _updateCheckAction();
-                }
+                if (_toDoItem.Is_Checked == value)
+                    return;
+                
+                _toDoItem.Is_Checked = value;
+                OnPropertyChanged(nameof(Is_Checked));
+                _ = _updateCheckAction();
             }
         }
         
         /// <summary>
         /// タスク名（タイトルや説明）を取得します。
         /// </summary>
-        public string? Task_Name => _toDo.Task_Name;
+        public string Task_Name => _toDoItem.Task_Name;
 
         /// <summary>
         /// チェック状態変更用コマンド
@@ -76,6 +78,22 @@ namespace SimpleToDo.mvvm.view_models
         public ICommand DeleteCommand { get; }
         
         /// <summary>
+        /// チェック状態更新コマンドの実行処理
+        /// </summary>
+        private async Task ExecuteUpdateIsCheckedAsync()
+        {
+            await _updateCheckAction();
+        }
+        
+        /// <summary>
+        /// 削除コマンドの実行処理
+        /// </summary>
+        private async Task ExecuteDeleteAsync()
+        {
+            await _deleteAction();
+        }
+        
+        /// <summary>
         /// プロパティ変更通知を発行します。
         /// </summary>
         /// <param name="propertyName">変更されたプロパティ名</param>
@@ -83,5 +101,5 @@ namespace SimpleToDo.mvvm.view_models
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-    }
+    }      
 }
