@@ -1,7 +1,7 @@
 ﻿using System.Windows.Input;
 
 namespace SimpleToDo.utils
-{    
+{
     /// <summary>
     /// 非同期処理に対応した汎用的なICommand実装クラスです。
     /// 非同期操作を実行するボタンやメニューなどに使用できます。
@@ -17,10 +17,10 @@ namespace SimpleToDo.utils
         // 非同期処理実行中フラグ
         private bool _isExecuting;
 
-    /// <summary>
-    /// コマンドの実行可能状態が変化したときに発生します。
-    /// </summary>
-    public event EventHandler? CanExecuteChanged;
+        /// <summary>
+        /// コマンドの実行可能状態が変化したときに発生します。
+        /// </summary>
+        public event EventHandler? CanExecuteChanged;
 
         /// <summary>
         /// コマンド実行可能状態を通知します。
@@ -49,7 +49,7 @@ namespace SimpleToDo.utils
             {
                 _isExecuting = true;
                 OnCanExecuteChanged();
-                
+
                 await _executeAsync();
             }
             finally
@@ -58,5 +58,5 @@ namespace SimpleToDo.utils
                 OnCanExecuteChanged();
             }
         }
-    }    
+    }
 }

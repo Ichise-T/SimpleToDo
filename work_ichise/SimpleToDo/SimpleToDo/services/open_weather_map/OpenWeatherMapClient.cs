@@ -54,14 +54,14 @@ namespace SimpleToDo.services.weather
                 query["appid"] = _apiKey;
                 query["units"] = "metric";
                 query["lang"] = "ja";
-                
+
                 var requestUrl = $"{BaseApiUrl}?{query}";
-                
+
                 // より安全かつ効率的なHTTPレスポンス処理
                 using var response = await _httpClient.GetAsync(requestUrl);
                 response.EnsureSuccessStatusCode(); // 400/500系エラーを確認
-                
-                var weatherData = await response.Content.ReadFromJsonAsync<WeatherResponse.WeatherApiResponse>() 
+
+                var weatherData = await response.Content.ReadFromJsonAsync<WeatherResponse.WeatherApiResponse>()
                     ?? new WeatherResponse.WeatherApiResponse();
 
                 // サーバーからのレスポンスが有効かチェック

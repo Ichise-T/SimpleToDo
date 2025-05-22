@@ -20,10 +20,10 @@ namespace SimpleToDo.mvvm.views
         public WeatherInfo()
         {
             InitializeComponent();
-            
+
             // MVVM パターンを厳密に適用するため、コードビハインドでのViewModelとの連携は最小限に
         }
-        
+
         /// <summary>
         /// 天気情報を手動で更新するメソッド
         /// </summary>

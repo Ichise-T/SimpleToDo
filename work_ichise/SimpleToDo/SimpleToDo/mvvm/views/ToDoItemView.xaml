@@ -7,15 +7,31 @@
              mc:Ignorable="d">
     <Grid>
         <!-- 入力エリア -->
-        <TextBox x:Name="TextBoxInputTask" Margin="0,0,125,0" TextWrapping="Wrap" KeyDown="TextBoxInputTask_KeyDown" Height="32" VerticalAlignment="Top" />
-        <Button x:Name="AppendTaskButton" Content="追加" Margin="0,0,20,0" Click="AppendTaskButton_Click" Height="32" VerticalAlignment="Top" HorizontalAlignment="Right" Width="100"/>
+        <TextBox x:Name="TextBoxInputTask"
+                Margin="0,0,125,0"
+                TextWrapping="Wrap"
+                KeyDown="TextBoxInputTask_KeyDown"
+                Height="32"
+                VerticalAlignment="Top"/>
+        <Button x:Name="AppendTaskButton"
+                Content="追加"
+                Margin="0,0,20,0"
+                Click="AppendTaskButton_Click"
+                Height="32"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Right"
+                Width="100"/>
 
         <!-- タスクリスト -->
-        <ScrollViewer Margin="0,50,0,0" VerticalScrollBarVisibility="Visible">
+        <ScrollViewer Margin="0,50,0,0"
+                VerticalScrollBarVisibility="Visible">
             <ItemsControl
-            x:Name="TaskItemsControl"
-            Grid.IsSharedSizeScope="True"
-            ItemsSource="{Binding ToDoItems}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0,0,25,0">
+                x:Name="TaskItemsControl"
+                Grid.IsSharedSizeScope="True"
+                ItemsSource="{Binding ToDoItems}"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Padding="0,0,25,0">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Border
@@ -26,38 +42,38 @@
                             BorderThickness="1">
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
                                 <!-- CheckBox -->
                                 <CheckBox
                                     VerticalAlignment="Center"
                                     IsChecked="{Binding Is_Checked}"
-                                    Command="{Binding UpdateIsCheckedCommand}" 
-                                />
+                                    Command="{Binding UpdateIsCheckedCommand}"/>
 
                                 <!-- Task Content -->
                                 <TextBlock
                                     Grid.Column="1"
                                     VerticalAlignment="Center"
                                     Text="{Binding Task_Name}"
-                                    Margin="8,0,0,0" 
-                                />
+                                    Margin="8,0,0,0"/>
 
                                 <!-- Delete Button -->
                                 <Button
                                     Grid.Column="2"
                                     Content="削除"
                                     Command="{Binding DeleteCommand}"
-                                    Margin="8,0,0,0" 
-                                />
+                                    Margin="8,0,0,0"/>
                             </Grid>
                         </Border>
                         <DataTemplate.Triggers>
-                            <DataTrigger Binding="{Binding Is_Checked}" Value="True">
-                                <Setter TargetName="TaskBorder" Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
+                            <DataTrigger Binding="{Binding Is_Checked}"
+                                    Value="True">
+                                <Setter TargetName="TaskBorder"
+                                        Property="Background"
+                                        Value="{DynamicResource MaterialDesignSelection}"/>
                             </DataTrigger>
                         </DataTemplate.Triggers>
                     </DataTemplate>

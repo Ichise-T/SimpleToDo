@@ -5,33 +5,33 @@ using System.Reflection;
 
 namespace SimpleToDo.services.database
 {
-  /// <summary>
-  /// 複数のデータベースに対応したCRUD操作を提供するマネージャクラス。
-  /// データベースの作成、テーブル作成、レコードの追加・取得・更新・削除を汎用的に行う。
-  /// </summary>
-  /// <remarks>
-  /// DatabaseCrudManagerのコンストラクタ
-  /// </remarks>
-  /// <param name="connectionFactory">データベース接続を生成するファクトリ関数</param>
-  /// <exception cref="ArgumentNullException">connectionFactoryがnullの場合</exception>
-  public class DatabaseCrudManager(Func<Task<IDbConnectionWrapper>> connectionFactory)
-  {
+    /// <summary>
+    /// 複数のデータベースに対応したCRUD操作を提供するマネージャクラス。
+    /// データベースの作成、テーブル作成、レコードの追加・取得・更新・削除を汎用的に行う。
+    /// </summary>
+    /// <remarks>
+    /// DatabaseCrudManagerのコンストラクタ
+    /// </remarks>
+    /// <param name="connectionFactory">データベース接続を生成するファクトリ関数</param>
+    /// <exception cref="ArgumentNullException">connectionFactoryがnullの場合</exception>
+    public class DatabaseCrudManager(Func<Task<IDbConnectionWrapper>> connectionFactory)
+    {
         // データベース接続用のファクトリ関数
         private readonly Func<Task<IDbConnectionWrapper>> _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
-        
+
         // SQLクエリキャッシュ - 同じ型のクエリを再生成しないようにする
         private static readonly Dictionary<Type, Dictionary<string, string>> _queryCache = new();
-        
+
         // スレッドセーフなロックオブジェクト
         private static readonly object _cacheLock = new();
 
-    /// <summary>
-    /// データベースを作成します（DB種別ごとにSQLを切り替え）。
-    /// </summary>
-    /// <param name="databaseName">作成するデータベース名</param>
-    /// <exception cref="ArgumentNullException">databaseNameがnullまたは空の場合</exception>
-    /// <exception cref="NotSupportedException">サポートされていないデータベース種別の場合</exception>
-    public async Task CreateDatabaseAsync(string databaseName)
+        /// <summary>
+        /// データベースを作成します（DB種別ごとにSQLを切り替え）。
+        /// </summary>
+        /// <param name="databaseName">作成するデータベース名</param>
+        /// <exception cref="ArgumentNullException">databaseNameがnullまたは空の場合</exception>
+        /// <exception cref="NotSupportedException">サポートされていないデータベース種別の場合</exception>
+        public async Task CreateDatabaseAsync(string databaseName)
         {
             if (string.IsNullOrWhiteSpace(databaseName))
                 throw new ArgumentNullException(nameof(databaseName), "データベース名が指定されていません");
@@ -74,7 +74,7 @@ namespace SimpleToDo.services.database
         {
             ValidateStringArgument(databaseName, nameof(databaseName));
             ValidateStringArgument(tableName, nameof(tableName));
-            
+
             if (columnDefinitions == null || columnDefinitions.Length == 0)
                 throw new ArgumentNullException(nameof(columnDefinitions), "カラム定義が指定されていません");
 
@@ -83,7 +83,7 @@ namespace SimpleToDo.services.database
             connection.ChangeDatabase(databaseName);
 
             string query = $"CREATE TABLE IF NOT EXISTS {tableName} (id INT AUTO_INCREMENT PRIMARY KEY, {string.Join(", ", columnDefinitions)});";
-            
+
             try
             {
                 using var command = connection.CreateCommand();
@@ -109,7 +109,7 @@ namespace SimpleToDo.services.database
         {
             ValidateStringArgument(databaseName, nameof(databaseName));
             ValidateStringArgument(tableName, nameof(tableName));
-            
+
             if (record == null)
                 throw new ArgumentNullException(nameof(record), "レコードがnullです");
 
@@ -118,7 +118,7 @@ namespace SimpleToDo.services.database
             connection.ChangeDatabase(databaseName);
 
             Type recordType = record.GetType();
-            
+
             // キャッシュからクエリを取得、またはビルド
             (string query, PropertyInfo[] properties) = GetInsertQuery(recordType, tableName);
 
@@ -159,7 +159,7 @@ namespace SimpleToDo.services.database
             connection.ChangeDatabase(databaseName);
 
             var dataTable = new DataTable(tableName);
-            
+
             try
             {
                 using var command = connection.CreateCommand();
@@ -168,7 +168,7 @@ namespace SimpleToDo.services.database
 
                 using var reader = await command.ExecuteReaderAsync();
                 dataTable.Load(reader);
-                
+
                 return dataTable;
             }
             catch (Exception ex)
@@ -194,7 +194,7 @@ namespace SimpleToDo.services.database
             connection.ChangeDatabase(databaseName);
 
             var dataTable = new DataTable(tableName);
-            
+
             try
             {
                 using var command = connection.CreateCommand();
@@ -208,7 +208,7 @@ namespace SimpleToDo.services.database
 
                 using var reader = await command.ExecuteReaderAsync();
                 dataTable.Load(reader);
-                
+
                 return dataTable;
             }
             catch (Exception ex)
@@ -230,7 +230,7 @@ namespace SimpleToDo.services.database
         {
             ValidateStringArgument(databaseName, nameof(databaseName));
             ValidateStringArgument(tableName, nameof(tableName));
-            
+
             if (record == null)
                 throw new ArgumentNullException(nameof(record), "レコードがnullです");
 
@@ -239,10 +239,10 @@ namespace SimpleToDo.services.database
             connection.ChangeDatabase(databaseName);
 
             Type recordType = record.GetType();
-            
+
             // キャッシュからクエリを取得、またはビルド
             (string query, PropertyInfo[] properties) = GetUpdateQuery(recordType, tableName);
-            
+
             try
             {
                 using var command = connection.CreateCommand();
@@ -303,11 +303,11 @@ namespace SimpleToDo.services.database
         /// <summary>
         /// データベースの種類を取得します。
         /// </summary>
-        private static string GetDatabaseType(IDbConnectionWrapper connection) 
+        private static string GetDatabaseType(IDbConnectionWrapper connection)
         {
             try
             {
-                return (connection as dynamic).InnerConnectionTypeName?.ToLower() ?? 
+                return (connection as dynamic).InnerConnectionTypeName?.ToLower() ??
                        connection.GetType().Name.ToLower();
             }
             catch
@@ -331,7 +331,7 @@ namespace SimpleToDo.services.database
         private static (string Query, PropertyInfo[] Properties) GetInsertQuery(Type recordType, string tableName)
         {
             string cacheKey = $"INSERT_{tableName}";
-            
+
             return GetOrCreateCachedQuery(recordType, cacheKey, properties =>
             {
                 var columnNames = string.Join(", ", properties.Select(param => param.Name.ToLower()));
@@ -346,7 +346,7 @@ namespace SimpleToDo.services.database
         private static (string Query, PropertyInfo[] Properties) GetUpdateQuery(Type recordType, string tableName)
         {
             string cacheKey = $"UPDATE_{tableName}";
-            
+
             return GetOrCreateCachedQuery(recordType, cacheKey, properties =>
             {
                 var setClause = string.Join(", ", properties.Select(p => p.Name.ToLower() + " = " + "@" + p.Name));
@@ -364,7 +364,7 @@ namespace SimpleToDo.services.database
             var properties = recordType.GetProperties()
                 .Where(p => !p.Name.Equals("id", StringComparison.OrdinalIgnoreCase))
                 .ToArray();
-            
+
             // 1つのロックブロックで処理
             lock (_cacheLock)
             {
@@ -373,7 +373,7 @@ namespace SimpleToDo.services.database
                     typeCache = [];
                     _queryCache[recordType] = typeCache;
                 }
-                
+
                 if (!typeCache.TryGetValue(cacheKey, out string? query))
                 {
                     query = queryBuilder(properties) ?? string.Empty;
@@ -395,11 +395,11 @@ namespace SimpleToDo.services.database
                 {
                     var parameter = command.CreateParameter();
                     parameter.ParameterName = "@" + property.Name;
-                    
+
                     // null値はDBNullに変換
                     var value = property.GetValue(record);
                     parameter.Value = value ?? DBNull.Value;
-                    
+
                     command.Parameters.Add(parameter);
                 }
                 catch (Exception ex)

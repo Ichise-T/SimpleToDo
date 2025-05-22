@@ -26,7 +26,7 @@ namespace SimpleToDo.mvvm.view_models
   /// </remarks>
   /// <param name="weatherInfo">表示する天気情報</param>
   [Obsolete("MainViewModelから直接WeatherInfoItemViewModelを使用しているため、このクラスは不要です。")]
-    public class WeatherInfoViewModel(string weatherInfo)
+  public class WeatherInfoViewModel(string weatherInfo)
   {
     /// <summary>
     /// 天気情報アイテムのコレクション。

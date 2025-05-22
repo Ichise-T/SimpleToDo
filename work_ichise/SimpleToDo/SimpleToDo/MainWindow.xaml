@@ -12,7 +12,9 @@
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
-        Title="タスク管理アプリ" Height="625" Width="876">
+        Title="タスク管理アプリ"
+        Height="625"
+        Width="876">
     <Grid Margin="0,10,0,3">
         <Grid.ColumnDefinitions>
             <ColumnDefinition MinWidth="290"/>
@@ -20,12 +22,22 @@
         </Grid.ColumnDefinitions>
 
         <!-- カレンダー部分 -->
-        <Calendar x:Name="Calendar" Margin="20,40,0,0" Cursor="AppStarting" MinHeight="350" VerticalAlignment="Top" MinWidth="250" HorizontalAlignment="Left" Width="250"/>
+        <Calendar x:Name="Calendar"
+                Margin="20,40,0,0"
+                Cursor="AppStarting"
+                MinHeight="350"
+                VerticalAlignment="Top"
+                MinWidth="250"
+                HorizontalAlignment="Left"
+                Width="250"/>
 
         <!-- 天気情報部分を別コントロールとして配置 -->
-        <views:WeatherInfo Margin="20,395,20,0" DataContext="{Binding}"/>
+        <views:WeatherInfo Margin="20,395,20,0"
+                DataContext="{Binding}"/>
 
         <!-- ToDoリスト部分を別コントロールとして配置 -->
-        <views:ToDo Grid.Column="1" Margin="20,40,0,0" DataContext="{Binding}"/>
+        <views:ToDo Grid.Column="1"
+                Margin="20,40,0,0"
+                DataContext="{Binding}"/>
     </Grid>
 </Window>

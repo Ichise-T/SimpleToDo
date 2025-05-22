@@ -31,7 +31,7 @@ namespace SimpleToDo.mvvm.view_models
         /// ToDoアイテムのViewModelコレクション
         /// </summary>
         public ObservableCollection<ToDoItemViewModel> ToDoItems { get; } = [];
-        
+
         // データベース操作用マネージャ
         private readonly DatabaseCrudManager _dbManager;
         // 天気情報APIクライアント
@@ -40,15 +40,15 @@ namespace SimpleToDo.mvvm.view_models
         private readonly string _databaseName;
         // テーブル名
         private readonly string _tableName;
-        
+
         // エラーメッセージ
         private string _errorMessage = string.Empty;
 
         /// <summary>
         /// エラーメッセージ（UIバインディング用）
         /// </summary>
-        public string ErrorMessage 
-        { 
+        public string ErrorMessage
+        {
             get => _errorMessage;
             set
             {
@@ -59,7 +59,7 @@ namespace SimpleToDo.mvvm.view_models
                 }
             }
         }
-        
+
         /// <summary>
         /// MainViewModelのコンストラクタ。DBやAPIクライアントの初期化を行います。
         /// </summary>
@@ -73,14 +73,14 @@ namespace SimpleToDo.mvvm.view_models
             _tableName = tableName;
 
             // データベース接続の初期化
-            _dbManager = new DatabaseCrudManager(() => 
+            _dbManager = new DatabaseCrudManager(() =>
                 Task.FromResult<IDbConnectionWrapper>(
                     new DbConnectionWrapper(new MySqlConnection(connectionString))
                 ));
-            
+
             // 天気情報APIクライアントの初期化
             _weatherClient = new OpenWeatherMapApiClient(apiKey);
-            
+
             // データベースの初期化を開始（非同期で実行）
             _ = InitializeDatabaseAsync();
         }
@@ -93,7 +93,7 @@ namespace SimpleToDo.mvvm.view_models
             try
             {
                 await _dbManager.CreateDatabaseAsync(_databaseName);
-                await _dbManager.CreateTableAsync(_databaseName, _tableName, 
+                await _dbManager.CreateTableAsync(_databaseName, _tableName,
                     ["task_name VARCHAR(250)", "is_checked BOOLEAN DEFAULT FALSE"]);
             }
             catch (Exception ex)
@@ -101,7 +101,7 @@ namespace SimpleToDo.mvvm.view_models
                 HandleException(ex, "データベース初期化");
             }
         }
-        
+
         /// <summary>
         /// ToDoデータをデータベースから読み込み、コレクションに反映します。
         /// </summary>
@@ -111,7 +111,7 @@ namespace SimpleToDo.mvvm.view_models
             {
                 DataTable dataTable = await _dbManager.ReadAllRecordAsync(_databaseName, _tableName);
                 List<ToDoItem> toDoList = new DataConverter().ConvertDataTableToList(dataTable);
-                
+
                 ToDoItems.Clear();
                 foreach (var toDoItem in toDoList)
                 {
@@ -123,7 +123,7 @@ namespace SimpleToDo.mvvm.view_models
                 HandleException(ex, "データ読み込み");
             }
         }
-        
+
         /// <summary>
         /// 新しいToDoアイテムを追加し、データベースとコレクションを更新します。
         /// </summary>
@@ -138,7 +138,7 @@ namespace SimpleToDo.mvvm.view_models
                 ToDoItem toDoItem = new() { Task_Name = taskName };
                 long taskId = await _dbManager.CreateRecordAsync(_databaseName, _tableName, toDoItem);
                 toDoItem.Id = taskId;
-                
+
                 AddToDoItemToCollection(toDoItem);
             }
             catch (Exception ex)
@@ -146,7 +146,7 @@ namespace SimpleToDo.mvvm.view_models
                 HandleException(ex, "タスク追加");
             }
         }
-        
+
         /// <summary>
         /// ToDoモデルをViewModelに変換し、コレクションに追加します。
         /// </summary>
@@ -159,7 +159,7 @@ namespace SimpleToDo.mvvm.view_models
                 () => DeleteToDoItemAsync(toDoItem)
             ));
         }
-        
+
         /// <summary>
         /// ToDoアイテムの内容を更新し、データベースに反映します。
         /// </summary>
@@ -175,7 +175,7 @@ namespace SimpleToDo.mvvm.view_models
                 HandleException(ex, "タスク更新");
             }
         }
-        
+
         /// <summary>
         /// ToDoアイテムを削除し、データベースとコレクションから除去します。
         /// </summary>
@@ -196,7 +196,7 @@ namespace SimpleToDo.mvvm.view_models
                 HandleException(ex, "タスク削除");
             }
         }
-        
+
         /// <summary>
         /// 天気情報をAPIから取得し、コレクションに反映します。
         /// </summary>
@@ -210,7 +210,7 @@ namespace SimpleToDo.mvvm.view_models
                     $"天気: {weatherInfo.Description}\n" +
                     $"気温: {weatherInfo.Temperature}°C\n" +
                     $"湿度: {weatherInfo.Humidity}%";
-                
+
                 WeatherInfoItems.Clear();
                 WeatherInfoItems.Add(new WeatherInfoItemViewModel(weatherInfoString));
             }
@@ -227,7 +227,7 @@ namespace SimpleToDo.mvvm.view_models
         {
             ErrorMessage = $"{operation}エラー: {ex.Message}";
         }
-        
+
         /// <summary>
         /// プロパティ変更通知を発行します。
         /// </summary>
