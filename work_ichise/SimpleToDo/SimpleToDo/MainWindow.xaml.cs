@@ -62,34 +62,5 @@ namespace SimpleToDo
                 _mainViewModel.ErrorMessage = $"天気情報の読み込み中にエラーが発生しました: {ex.Message}";
             }
         }
-
-        /// <summary>
-        /// タスク追加ボタンがクリックされたときのイベントハンドラ
-        /// 新しいタスクを追加し、テキストボックスをクリアします。
-        /// </summary>
-        /// <param name="sender">イベントの送信元</param>
-        /// <param name="e">イベント引数</param>
-        private async void AppendTaskButton_Click(object sender, RoutedEventArgs e)
-        {
-            await _mainViewModel.AddToDoItemAsync(TextBoxInputTask.Text);
-            TextBoxInputTask.Text = "";
-        }
-
-        /// <summary>
-        /// テキストボックスでEnterキーが押されたときのイベントハンドラ
-        /// タスク追加ボタンをクリックするのと同じ処理を実行します。
-        /// </summary>
-        /// <param name="sender">イベントの送信元</param>
-        /// <param name="e">イベント引数</param>
-        /// <remarks>
-        /// このメソッドは、Enterキーが押されたときにタスクを追加するためのショートカットとして機能します。
-        /// </remarks>
-        private void TextBoxInputTask_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                AppendTaskButton_Click(sender, e);
-            }
-        }
     }
 }

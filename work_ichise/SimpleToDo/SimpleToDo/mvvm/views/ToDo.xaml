@@ -1,0 +1,62 @@
+﻿<UserControl x:Class="SimpleToDo.mvvm.views.ToDo"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:SimpleToDo.mvvm.views"
+             mc:Ignorable="d">
+    <Grid>
+        <TextBox x:Name="TextBoxInputTask" Margin="0,0,105,0" TextWrapping="Wrap" KeyDown="TextBoxInputTask_KeyDown" Height="32" VerticalAlignment="Top" />
+        <Button x:Name="AppendTaskButton" Content="追加" Margin="0,0,0,0" Click="AppendTaskButton_Click" Height="32" VerticalAlignment="Top" HorizontalAlignment="Right" Width="100"/>
+        <ScrollViewer Margin="0,50,0,0" VerticalScrollBarVisibility="Visible">
+            <ItemsControl
+            x:Name="TaskItemsControl"
+            Grid.IsSharedSizeScope="True"
+            ItemsSource="{Binding ToDoItems}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0,0,25,0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border
+                            x:Name="TaskBorder"
+                            Padding="8"
+                            Margin="4"
+                            BorderBrush="{DynamicResource MaterialDesignDivider}"
+                            BorderThickness="1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <!-- CheckBox -->
+                                <CheckBox
+                                VerticalAlignment="Center"
+                                IsChecked="{Binding Is_Checked}"
+                                Command="{Binding UpdateIsCheckedCommand}" 
+                            />
+                                <!-- Task Content -->
+                                <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="{Binding Task_Name}"
+                                Margin="8,0,0,0" 
+                            />
+                                <!-- Delete Button -->
+                                <Button
+                                Grid.Column="2"
+                                Content="削除"
+                                Command="{Binding DeleteCommand}"
+                                Margin="8,0,0,0" 
+                            />
+                            </Grid>
+                        </Border>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding Is_Checked}" Value="True">
+                                <Setter TargetName="TaskBorder" Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

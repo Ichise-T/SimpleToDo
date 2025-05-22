@@ -31,3 +31,42 @@
       </appSettings>
     </configuration>
   ```
+
+## ディレクトリ構造
+
+```text
+SimpleToDo/
+│
+├── App.config                - アプリケーション設定（接続文字列、APIキーなど）
+├── App.xaml                  - アプリケーション定義とリソース
+├── App.xaml.cs               - アプリケーションのコードビハインド
+├── MainWindow.xaml           - メインウィンドウのUI定義
+├── MainWindow.xaml.cs        - メインウィンドウのコードビハインド
+│
+├── mvvm/                     - MVVMパターン関連のクラス
+│   ├── models/               - データモデル
+│   │   └── ToDo.cs           - ToDoアイテムのデータモデル
+│   │
+│   ├── views/                - ビュー（UserControlなど）
+│   │   ├── ToDo.xaml         - ToDoリスト表示用のUserControl
+│   │   └── WeatherInfo.xaml  - 天気情報表示用のUserControl
+│   │
+│   └── view_models/          - ビューモデル
+│       ├── MainViewModel.cs  - アプリケーション全体の状態管理
+│       ├── ToDo.cs           - ToDoアイテム用のビューモデル
+│       └── WeatherInfo.cs    - 天気情報用のビューモデル
+│
+├── services/                 - サービスクラス群
+│   ├── database/             - データベース操作関連
+│   │   ├── DatabaseCrudManager.cs - データベースCRUD操作
+│   │   ├── interfaces/       - データベース操作のインターフェース
+│   │   └── wrappers/         - データベース接続のラッパークラス
+│   │
+│   └── open_weather_map/     - 天気情報API関連
+│       ├── OpenWeatherMapApiClient.cs - API通信処理
+│       └── models/           - APIレスポンスのデータモデル
+│
+└── utils/                    - ユーティリティクラス
+    ├── RelayCommand.cs       - コマンドパターン実装
+    └── DataConvert.cs        - データ変換ユーティリティ
+```
